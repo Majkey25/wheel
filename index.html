@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Náhodný Výběr</title>
     <link rel="icon" sizes="192x192" href="icon/logo.png" type="image/png">
-    <link rel="icon" sizes="512x512" href="icon/logo2.png" type="image/png">
+<link rel="icon" sizes="512x512" href="icon/logo2.png" type="image/png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -127,6 +127,24 @@
             cursor: pointer;
             font-size: 1.2em;
         }
+        .confetti {
+    position: absolute;
+    width: 10px; /* Šířka konfety */
+    height: 30px; /* Výška konfety */
+    background-color: transparent; /* Nezobrazuj pozadí */
+    opacity: 0.8; /* Průhlednost */
+    animation: fall 2s ease-in forwards;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-100vh);
+    }
+    100% {
+        transform: translateY(100vh);
+    }
+}
+
     </style>
 </head>
 <body>
@@ -301,6 +319,7 @@ function drawWheel() {
                 modal.style.display = 'none';
             }
         });
+        
     </script>
 </body>
 </html>
