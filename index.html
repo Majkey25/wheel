@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Náhodný Výběr</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: space-around; /* Space between menu and wheel */
+            align-items: center; /* Center vertically */
+            height: 100vh; /* Full height */
+            margin: 0; /* Remove default margin */
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        .menu {
+            max-width: 300px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Enable vertical scroll if needed */
+            max-height: 80vh; /* Set max height for menu */
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #wheelContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center the wheel */
+            height: 100%; /* Full height for centering */
+        }
+
+        canvas {
+            border: 10px solid #28a745;
+            border-radius: 50%;
+            display: block;
+            margin: 20px 0; /* Margin above and below */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: rgb(255, 0, 0);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .remove-button {
+            margin-left: 10px;
+            background: transparent;
+            border: none;
+            color: red;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <h1>Náhodný Výběr</h1>
+
+        <h2>Číselný rozsah</h2>
+        <input type="number" id="maxNumber" placeholder="Maximální číslo">
+        <button id="generateRange">Generovat čísla</button>
+
+        <h2>Přidat možnosti</h2>
+        <input type="text" id="optionInput" placeholder="Zadejte možnost">
+        <button id="addButton">Přidat možnost</button>
+        <button id="spinButton">Točit</button>
+        
+        <h2 id="optionsHeader" style="display: none;">Možnosti:</h2>
+        <ul id="optionsList" style="display: none;"></ul>            
+    </div>
+
+    <div id="wheelContainer">
+        <canvas id="wheel" width="600" height="600"></canvas>
+    </div>      
+
+    <!-- Modální okno -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Vybraná možnost:</h2>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const options = [];
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinButton = document.getElementById('spinButton');
+        const modal = document.getElementById('modal');
+        const resultDiv = document.getElementById('result');
+        const closeModal = document.getElementsByClassName('close')[0];
+        const optionInput = document.getElementById('optionInput');
+        const addButton = document.getElementById('addButton');
+        const optionsList = document.getElementById('optionsList');
+        const optionsHeader = document.getElementById('optionsHeader');
+
+        // Initialize: hide options list and header
+        optionsList.style.display = 'none';
+        optionsHeader.style.display = 'none';
+
+        function drawWheel() {
+    const numOptions = options.length;
+    if (numOptions === 0) return; // Pokud nejsou žádné možnosti, nic nekreslíme
+
+    const angle = (2 * Math.PI) / numOptions;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2); // Center the wheel
+
+    for (let i = 0; i < numOptions; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, 200, i * angle, (i + 1) * angle);
+        ctx.fillStyle = i % 2 === 0 ? '#ffcc00' : '#ff9900';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+        ctx.fillStyle = '#000';
+        // Adjusted text position to better center
+        ctx.fillText(options[i], 100 * Math.cos(i * angle + angle / 2), 100 * Math.sin(i * angle + angle / 2));
+    }
+
+    ctx.restore();
+}
+
+// Spin animation unchanged
+spinAnimation = (startTime) => {
+    const elapsed = startTime ? Date.now() - startTime : 0;
+    const currentAngle = (elapsed / spinDuration) * spinAngle;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((currentAngle * Math.PI) / 180);
+    drawWheel();
+    ctx.restore();
+
+    if (elapsed < spinDuration) {
+        requestAnimationFrame(() => spinAnimation(startTime || Date.now()));
+    } else {
+        const finalAngle = (currentAngle % 360) / (360 / options.length);
+        const selectedOptionIndex = Math.floor(finalAngle);
+        const selectedOption = options[selectedOptionIndex];
+        resultDiv.innerText = selectedOption;
+        modal.style.display = 'block';
+    }
+};
+
+        addButton.addEventListener('click', () => {
+            const option = optionInput.value.trim();
+            if (option) {
+                options.push(option);
+                optionInput.value = '';
+                renderOptions();
+                drawWheel();
+                spinButton.style.display = 'block'; // Show the spin button after adding options
+            }
+        });
+
+        document.getElementById('generateRange').addEventListener('click', () => {
+            const maxNumber = parseInt(document.getElementById('maxNumber').value);
+            if (maxNumber && maxNumber > 0) {
+                options.length = 0; // Clear current options
+                for (let i = 1; i <= maxNumber; i++) {
+                    options.push(i.toString()); // Add numbers as strings
+                }
+                optionInput.value = ''; // Clear input field
+                renderOptions(); // Render only number range
+                drawWheel(); // Draw wheel
+                spinButton.style.display = 'block'; // Show spin button after generating range
+            } else {
+                alert("Zadejte platné maximální číslo."); // Error alert
+            }
+        });
+
+        spinButton.addEventListener('click', () => {
+    // Check if there is more than 1 option
+    if (options.length <= 1) {
+        alert("Musíte mít alespoň 2 možnosti pro točení kola.");
+        return; // Exit function if there's not more than 1 option
+    }
+
+    const spinDuration = 4000;
+    const spinAngle = Math.random() * 360 + 720; // Random spin between 720 and 1080 degrees
+    console.log("Spinning the wheel with angle:", spinAngle); // Debug log
+
+    const spinAnimation = (startTime) => {
+        const elapsed = startTime ? Date.now() - startTime : 0;
+        const currentAngle = (elapsed / spinDuration) * spinAngle;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((currentAngle * Math.PI) / 180);
+        drawWheel();
+        ctx.restore();
+
+        if (elapsed < spinDuration) {
+            requestAnimationFrame(() => spinAnimation(startTime || Date.now()));
+        } else {
+            const finalAngle = (currentAngle % 360) / (360 / options.length);
+            const selectedOptionIndex = Math.floor(finalAngle);
+            console.log("Final angle:", finalAngle, "Selected index:", selectedOptionIndex); // Debug log
+            const selectedOption = options[selectedOptionIndex];
+            resultDiv.innerText = selectedOption;
+            modal.style.display = 'block';
+        }
+    };
+
+    spinAnimation(Date.now()); // Start spin animation with the current timestamp
+});
+
+
+        closeModal.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function renderOptions() {
+            optionsList.innerHTML = ''; // Clear previous options
+            options.forEach((option, index) => {
+                const li = document.createElement('li');
+
+                // Create input for renaming
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = option;
+                input.onchange = () => {
+                    options[index] = input.value; // Update the option
+                    drawWheel(); // Redraw the wheel
+                };
+
+                // Create remove button
+                const removeButton = document.createElement('button');
+                removeButton.innerText = '×';
+                removeButton.className = 'remove-button';
+                removeButton.onclick = () => {
+                    options.splice(index, 1); // Remove option
+                    renderOptions(); // Re-render options
+                    drawWheel(); // Redraw the wheel
+                    if (options.length < 2) spinButton.style.display = 'none'; // Hide spin button if less than 2 options
+                };
+
+                li.appendChild(input);
+                li.appendChild(removeButton);
+                optionsList.appendChild(li);
+            });
+
+            // Show the options list if there are any options
+            if (options.length > 0) {
+                optionsHeader.style.display = 'block';
+                optionsList.style.display = 'block';
+            } else {
+                optionsHeader.style.display = 'none';
+                optionsList.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
