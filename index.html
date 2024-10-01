@@ -64,6 +64,7 @@
             border-radius: 5px;
             display: flex;
             justify-content: space-between;
+            align-items: center; /* Align items vertically */
         }
 
         #wheelContainer {
@@ -144,7 +145,7 @@
     </div>
 
     <div id="wheelContainer">
-        <canvas id="wheel" width="600" height="600"></canvas>
+        <canvas id="wheel" width="800" height="800"></canvas>
     </div>      
 
     <!-- Modální okno -->
@@ -169,57 +170,71 @@
         const optionsList = document.getElementById('optionsList');
         const optionsHeader = document.getElementById('optionsHeader');
 
-        // Initialize: hide options list and header
         optionsList.style.display = 'none';
         optionsHeader.style.display = 'none';
 
-        function drawWheel() {
+function drawWheel() {
     const numOptions = options.length;
-    if (numOptions === 0) return; // Pokud nejsou žádné možnosti, nic nekreslíme
+    if (numOptions === 0) return;
 
     const angle = (2 * Math.PI) / numOptions;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2); // Center the wheel
+    ctx.translate(canvas.width / 2, canvas.height / 2); // Střed rotace
 
+    const radius = 350; // Poloměr pro segmenty kola
+    const textRadius = 300; // Poloměr pro text, přiblížený ke středu kola
     for (let i = 0; i < numOptions; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.arc(0, 0, 200, i * angle, (i + 1) * angle);
-        ctx.fillStyle = i % 2 === 0 ? '#ffcc00' : '#ff9900';
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.stroke();
-        ctx.fillStyle = '#000';
-        // Adjusted text position to better center
-        ctx.fillText(options[i], 100 * Math.cos(i * angle + angle / 2), 100 * Math.sin(i * angle + angle / 2));
-    }
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
+    
+    // Změna barev na méně výrazné
+    ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`; // Snížení sytosti a zvýšení jasu
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.stroke();
+    
+    ctx.fillStyle = '#000';
+    ctx.font = "bold 30px 'Lato', sans-serif";
+
+    // Získej šířku a výšku textu
+    const text = options[i];
+    const textWidth = ctx.measureText(text).width;
+    const textHeight = 30; // Výška fontu
+
+    // Vykresli text, posuň ho o polovinu šířky a výšky zpět
+    ctx.fillText(text, 
+        textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2, // Odsun o polovinu šířky
+        textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2 // Odsun o polovinu výšky
+    );
+}
 
     ctx.restore();
 }
+        spinButton.addEventListener('click', () => {
+            // Check if there is more than 1 option
+            if (options.length <= 1) {
+                alert("Musíte mít alespoň 2 možnosti pro točení kola.");
+                return;
+            }
 
-// Spin animation unchanged
-spinAnimation = (startTime) => {
-    const elapsed = startTime ? Date.now() - startTime : 0;
-    const currentAngle = (elapsed / spinDuration) * spinAngle;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((currentAngle * Math.PI) / 180);
-    drawWheel();
-    ctx.restore();
+            // Using the original rotate function approach
+            const min = 1024;
+            const max = 9999;
+            const deg = Math.floor(Math.random() * (max - min)) + min;
+            canvas.style.transition = "transform 5s ease-out";
+            canvas.style.transform = `rotate(${deg}deg)`;
 
-    if (elapsed < spinDuration) {
-        requestAnimationFrame(() => spinAnimation(startTime || Date.now()));
-    } else {
-        const finalAngle = (currentAngle % 360) / (360 / options.length);
-        const selectedOptionIndex = Math.floor(finalAngle);
-        const selectedOption = options[selectedOptionIndex];
-        resultDiv.innerText = selectedOption;
-        modal.style.display = 'block';
-    }
-};
+            // Show modal after the spin
+            setTimeout(() => {
+                const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
+                const selectedOption = options[selectedIndex];
+                resultDiv.innerText = selectedOption;
+                modal.style.display = 'block';
+            }, 5000); // Show result after 5 seconds
+        });
 
         addButton.addEventListener('click', () => {
             const option = optionInput.value.trim();
@@ -228,112 +243,62 @@ spinAnimation = (startTime) => {
                 optionInput.value = '';
                 renderOptions();
                 drawWheel();
-                spinButton.style.display = 'block'; // Show the spin button after adding options
+                spinButton.style.display = 'block';
             }
         });
 
         document.getElementById('generateRange').addEventListener('click', () => {
             const maxNumber = parseInt(document.getElementById('maxNumber').value);
             if (maxNumber && maxNumber > 0) {
-                options.length = 0; // Clear current options
+                options.length = 0;
                 for (let i = 1; i <= maxNumber; i++) {
-                    options.push(i.toString()); // Add numbers as strings
+                    options.push(i.toString());
                 }
-                optionInput.value = ''; // Clear input field
-                renderOptions(); // Render only number range
-                drawWheel(); // Draw wheel
-                spinButton.style.display = 'block'; // Show spin button after generating range
-            } else {
-                alert("Zadejte platné maximální číslo."); // Error alert
+                renderOptions();
+                drawWheel();
             }
         });
 
-        spinButton.addEventListener('click', () => {
-    // Check if there is more than 1 option
-    if (options.length <= 1) {
-        alert("Musíte mít alespoň 2 možnosti pro točení kola.");
-        return; // Exit function if there's not more than 1 option
-    }
-
-    const spinDuration = 4000;
-    const spinAngle = Math.random() * 360 + 720; // Random spin between 720 and 1080 degrees
-    console.log("Spinning the wheel with angle:", spinAngle); // Debug log
-
-    const spinAnimation = (startTime) => {
-        const elapsed = startTime ? Date.now() - startTime : 0;
-        const currentAngle = (elapsed / spinDuration) * spinAngle;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate((currentAngle * Math.PI) / 180);
-        drawWheel();
-        ctx.restore();
-
-        if (elapsed < spinDuration) {
-            requestAnimationFrame(() => spinAnimation(startTime || Date.now()));
-        } else {
-            const finalAngle = (currentAngle % 360) / (360 / options.length);
-            const selectedOptionIndex = Math.floor(finalAngle);
-            console.log("Final angle:", finalAngle, "Selected index:", selectedOptionIndex); // Debug log
-            const selectedOption = options[selectedOptionIndex];
-            resultDiv.innerText = selectedOption;
-            modal.style.display = 'block';
-        }
-    };
-
-    spinAnimation(Date.now()); // Start spin animation with the current timestamp
-});
-
-
-        closeModal.onclick = () => {
-            modal.style.display = 'none';
-        };
-
-        window.onclick = (event) => {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        };
-
         function renderOptions() {
-            optionsList.innerHTML = ''; // Clear previous options
+            optionsList.innerHTML = '';
             options.forEach((option, index) => {
                 const li = document.createElement('li');
-
-                // Create input for renaming
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = option;
-                input.onchange = () => {
-                    options[index] = input.value; // Update the option
-                    drawWheel(); // Redraw the wheel
-                };
-
-                // Create remove button
-                const removeButton = document.createElement('button');
-                removeButton.innerText = '×';
-                removeButton.className = 'remove-button';
-                removeButton.onclick = () => {
-                    options.splice(index, 1); // Remove option
-                    renderOptions(); // Re-render options
-                    drawWheel(); // Redraw the wheel
-                    if (options.length < 2) spinButton.style.display = 'none'; // Hide spin button if less than 2 options
-                };
-
-                li.appendChild(input);
-                li.appendChild(removeButton);
+                li.innerHTML = `
+                    <input type="text" value="${option}" onchange="updateOption(${index}, this.value)">
+                    <button class="remove-button" onclick="removeOption(${index})">&times;</button>
+                `;
                 optionsList.appendChild(li);
             });
 
-            // Show the options list if there are any options
             if (options.length > 0) {
-                optionsHeader.style.display = 'block';
                 optionsList.style.display = 'block';
+                optionsHeader.style.display = 'block';
             } else {
-                optionsHeader.style.display = 'none';
                 optionsList.style.display = 'none';
+                optionsHeader.style.display = 'none';
             }
         }
+
+        function updateOption(index, value) {
+            options[index] = value;
+            drawWheel();
+        }
+
+        function removeOption(index) {
+            options.splice(index, 1);
+            renderOptions();
+            drawWheel();
+        }
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
