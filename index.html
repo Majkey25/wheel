@@ -176,7 +176,9 @@
             <div id="result"></div>
         </div>
     </div>
-
+ <footer>
+        <p>&copy; Made by Matěj Teplý, <span id="year"></span></p>
+    </footer>
     <script>
         const options = [];
         const canvas = document.getElementById('wheel');
@@ -319,7 +321,7 @@ function drawWheel() {
                 modal.style.display = 'none';
             }
         });
-        
+        document.getElementById('year').textContent = new Date().getFullYear();
     </script>
 </body>
 </html>
