@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Náhodný Výběr</title>
+    <title>Random Selection</title>
     <link rel="icon" sizes="192x192" href="icon/logo.png" type="image/png">
-<link rel="icon" sizes="512x512" href="icon/logo2.png" type="image/png">
+    <link rel="icon" sizes="512x512" href="icon/logo2.png" type="image/png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -127,50 +127,45 @@
             cursor: pointer;
             font-size: 1.2em;
         }
-        .confetti {
-    position: absolute;
-    width: 10px; /* Šířka konfety */
-    height: 30px; /* Výška konfety */
-    background-color: transparent; /* Nezobrazuj pozadí */
-    opacity: 0.8; /* Průhlednost */
-    animation: fall 2s ease-in forwards;
-}
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
 
-@keyframes fall {
-    0% {
-        transform: translateY(-100vh);
-    }
-    100% {
-        transform: translateY(100vh);
-    }
-}
-
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    background-color: #f4f4f4;
-    padding: 10px 0;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
+        footer {
+            position: fixed; /* Fixed to the bottom */
+            bottom: 0; /* Positioned at the bottom */
+            left: 0; /* Positioned to the left */
+            width: 100%; /* Width to 100% */
+            text-align: center; /* Center text */
+            background-color: #f4f4f4; /* Footer background */
+            padding: 0px 0; /* Padding top and bottom */
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Shadow above footer */
+            display: flex; /* Flexbox layout */
+            justify-content: center; /* Center the items */
+            gap: 10px; /* Space between paragraphs */
+        }
     </style>
 </head>
 <body>
     <div class="menu">
-        <h1>Náhodný Výběr</h1>
+        <h1>Random Selection</h1>
 
-        <h2>Číselný rozsah</h2>
-        <input type="number" id="maxNumber" placeholder="Maximální číslo">
-        <button id="generateRange">Generovat čísla</button>
+        <h2>Number Range</h2>
+        <input type="number" id="maxNumber" placeholder="Maximum number">
+        <button id="generateRange">Generate numbers</button>
 
-        <h2>Přidat možnosti</h2>
-        <input type="text" id="optionInput" placeholder="Zadejte možnost">
-        <button id="addButton">Přidat možnost</button>
-        <button id="spinButton">Točit</button>
+        <h2>Add Options</h2>
+        <input type="text" id="optionInput" placeholder="Enter option">
+        <button id="addButton">Add option</button>
+        <button id="spinButton">Spin</button>
         
-        <h2 id="optionsHeader" style="display: none;">Možnosti:</h2>
+        <h2 id="optionsHeader" style="display: none;">Options:</h2>
         <ul id="optionsList" style="display: none;"></ul>            
     </div>
 
@@ -178,16 +173,17 @@ footer {
         <canvas id="wheel" width="800" height="800"></canvas>
     </div>      
 
-    <!-- Modální okno -->
+    <!-- Modal Window -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Vybraná možnost:</h2>
+            <h2>Selected Option:</h2>
             <div id="result"></div>
         </div>
     </div>
- <footer>
-        <p>&copy; Made by Matěj Teplý, <span id="year"></span></p>
+    <footer>
+        <p>Made by Matěj Teplý</p>
+        <p>&copy; <span id="year"></span> All rights reserved.</p>
     </footer>
     <script>
         const options = [];
@@ -205,50 +201,51 @@ footer {
         optionsList.style.display = 'none';
         optionsHeader.style.display = 'none';
 
-function drawWheel() {
-    const numOptions = options.length;
-    if (numOptions === 0) return;
+        function drawWheel() {
+            const numOptions = options.length;
+            if (numOptions === 0) return;
 
-    const angle = (2 * Math.PI) / numOptions;
+            const angle = (2 * Math.PI) / numOptions;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2); // Střed rotace
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2); // Center of rotation
 
-    const radius = 350; // Poloměr pro segmenty kola
-    const textRadius = 300; // Poloměr pro text, přiblížený ke středu kola
-    for (let i = 0; i < numOptions; i++) {
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
-    
-    // Změna barev na méně výrazné
-    ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`; // Snížení sytosti a zvýšení jasu
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.stroke();
-    
-    ctx.fillStyle = '#000';
-    ctx.font = "bold 30px 'Lato', sans-serif";
+            const radius = 350; // Radius for wheel segments
+            const textRadius = 300; // Radius for text, closer to the center of the wheel
+            for (let i = 0; i < numOptions; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
+                
+                // Change colors to less vibrant
+                ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`; // Lower saturation and increase brightness
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
+                
+                ctx.fillStyle = '#000';
+                ctx.font = "bold 30px 'Lato', sans-serif";
 
-    // Získej šířku a výšku textu
-    const text = options[i];
-    const textWidth = ctx.measureText(text).width;
-    const textHeight = 30; // Výška fontu
+                // Get width and height of text
+                const text = options[i];
+                const textWidth = ctx.measureText(text).width;
+                const textHeight = 30; // Font height
 
-    // Vykresli text, posuň ho o polovinu šířky a výšky zpět
-    ctx.fillText(text, 
-        textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2, // Odsun o polovinu šířky
-        textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2 // Odsun o polovinu výšky
-    );
-}
+                // Draw text, offset it by half width and height back
+                ctx.fillText(text, 
+                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2, // Offset by half width
+                    textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2 // Offset by half height
+                );
+            }
 
-    ctx.restore();
-}
+            ctx.restore();
+        }
+
         spinButton.addEventListener('click', () => {
             // Check if there is more than 1 option
             if (options.length <= 1) {
-                alert("Musíte mít alespoň 2 možnosti pro točení kola.");
+                alert("You must have at least 2 options to spin the wheel.");
                 return;
             }
 
