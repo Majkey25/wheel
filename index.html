@@ -150,6 +150,13 @@
             justify-content: center; /* Center the items */
             gap: 10px; /* Space between paragraphs */
         }
+        #arrow {
+            font-size: 50px; /* Velikost šipky */
+            color: #28a745; /* Barva šipky */
+            text-align: center;
+            width: 100%; /* Šipka bude na střed */
+        }
+
     </style>
 </head>
 <body>
@@ -170,6 +177,9 @@
     </div>
 
     <div id="wheelContainer">
+        <div id="arrow" style="position: absolute; top: 20px; z-index: 1;">
+            <img src="media/red_arrow.png" alt="Arrow" id="arrow" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 50px;">
+        </div>
         <canvas id="wheel" width="800" height="800"></canvas>
     </div>      
 
@@ -181,6 +191,7 @@
             <div id="result"></div>
         </div>
     </div>
+    
 
     
     <footer>
@@ -199,74 +210,99 @@
         const addButton = document.getElementById('addButton');
         const optionsList = document.getElementById('optionsList');
         const optionsHeader = document.getElementById('optionsHeader');
-
+    
         optionsList.style.display = 'none';
         optionsHeader.style.display = 'none';
-
+    
+        // Load sound
+        const clickSound = new Audio('media/click.wav');
+    
         function drawWheel() {
             const numOptions = options.length;
             if (numOptions === 0) return;
-
+    
             const angle = (2 * Math.PI) / numOptions;
-
+    
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2); // Center of rotation
-
+    
             const radius = 350; // Radius for wheel segments
             const textRadius = 300; // Radius for text, closer to the center of the wheel
             for (let i = 0; i < numOptions; i++) {
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
                 ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
-                
-                // Change colors to less vibrant
-                ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`; // Lower saturation and increase brightness
+    
+                ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`;
                 ctx.fill();
                 ctx.strokeStyle = '#fff';
                 ctx.stroke();
-                
+    
                 ctx.fillStyle = '#000';
                 ctx.font = "bold 30px 'Lato', sans-serif";
-
-                // Get width and height of text
+    
                 const text = options[i];
                 const textWidth = ctx.measureText(text).width;
-                const textHeight = 30; // Font height
-
-                // Draw text, offset it by half width and height back
-                ctx.fillText(text, 
-                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2, // Offset by half width
-                    textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2 // Offset by half height
+                const textHeight = 30;
+    
+                ctx.fillText(text,
+                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
+                    textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2
                 );
             }
-
+    
             ctx.restore();
         }
-
+    
         spinButton.addEventListener('click', () => {
-            // Check if there is more than 1 option
             if (options.length <= 1) {
                 alert("You must have at least 2 options to spin the wheel.");
                 return;
             }
-
-            // Using the original rotate function approach
+    
             const min = 1024;
             const max = 9999;
             const deg = Math.floor(Math.random() * (max - min)) + min;
             canvas.style.transition = "transform 5s ease-out";
             canvas.style.transform = `rotate(${deg}deg)`;
-
-            // Show modal after the spin
+    
+            // Play sound
+            let currentTime = 0; // Track elapsed time
+            let isPlaying = false; // Flag to track sound state
+    
+            const getClickInterval = (timeElapsed) => {
+                const normalizedTime = timeElapsed / 5000; // Normalize to spin duration
+                return Math.max(50, 400 * normalizedTime); // Adjust based on speed
+            };
+    
+            const playClicks = () => {
+                if (currentTime < 5000) {
+                    const interval = getClickInterval(currentTime);
+                    if (!isPlaying) {
+                        clickSound.currentTime = 0; // Reset sound to start
+                        clickSound.play(); // Play sound
+                        isPlaying = true; // Mark as playing
+                        setTimeout(() => {
+                            isPlaying = false; // Reset after sound plays
+                        }, interval);
+                    }
+                    currentTime += interval; // Update time
+                    setTimeout(playClicks, interval); // Schedule next sound
+                }
+            };
+    
+            // Show result after spin
             setTimeout(() => {
-                const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
-                const selectedOption = options[selectedIndex];
-                resultDiv.innerText = selectedOption;
-                modal.style.display = 'block';
-            }, 5000); // Show result after 5 seconds
+    const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
+    const selectedOption = options[selectedIndex];
+    resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
+    // Modal se nyní nezobrazuje
+}, 5000);
+    
+            playClicks(); // Start playing the clicks
         });
-
+    
         addButton.addEventListener('click', () => {
             const option = optionInput.value.trim();
             if (option) {
@@ -277,7 +313,7 @@
                 spinButton.style.display = 'block';
             }
         });
-
+    
         document.getElementById('generateRange').addEventListener('click', () => {
             const maxNumber = parseInt(document.getElementById('maxNumber').value);
             if (maxNumber && maxNumber > 0) {
@@ -289,7 +325,7 @@
                 drawWheel();
             }
         });
-
+    
         function renderOptions() {
             optionsList.innerHTML = '';
             options.forEach((option, index) => {
@@ -300,7 +336,7 @@
                 `;
                 optionsList.appendChild(li);
             });
-
+    
             if (options.length > 0) {
                 optionsList.style.display = 'block';
                 optionsHeader.style.display = 'block';
@@ -309,28 +345,29 @@
                 optionsHeader.style.display = 'none';
             }
         }
-
+    
         function updateOption(index, value) {
             options[index] = value;
             drawWheel();
         }
-
+    
         function removeOption(index) {
             options.splice(index, 1);
             renderOptions();
             drawWheel();
         }
-
+    
         closeModal.addEventListener('click', () => {
             modal.style.display = 'none';
         });
-
+    
         window.addEventListener('click', (event) => {
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
         });
+    
         document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+    </script>    
 </body>
 </html>
