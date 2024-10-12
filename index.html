@@ -259,53 +259,57 @@
         }
     
         spinButton.addEventListener('click', () => {
-            if (options.length <= 1) {
-                alert("You must have at least 2 options to spin the wheel.");
-                return;
+    if (options.length <= 1) {
+        alert("You must have at least 2 options to spin the wheel.");
+        return;
+    }
+
+    const min = 1440;  // 4 otáčky
+    const max = 2520; // 7 otáček
+    const deg = Math.floor(Math.random() * (max - min)) + min;
+
+    // Upravená animace na pomalejší začátek
+    canvas.style.transition = "transform 16s cubic-bezier(0.3, 0.6, 0.2, 1)";
+    canvas.style.transform = `rotate(${deg}deg)`;
+
+    let lastSegmentIndex = null;
+
+    const syncClicks = () => {
+        const currentRotation = getComputedStyle(canvas).transform;
+
+        const matrixValues = currentRotation.match(/matrix\((.+)\)/);
+        if (matrixValues) {
+            const matrix = matrixValues[1].split(', ');
+            const a = parseFloat(matrix[0]);
+            const b = parseFloat(matrix[1]);
+            const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
+
+            const normalizedAngle = (currentAngle + 360) % 360;
+            const anglePerSegment = 360 / options.length;
+            const currentSegmentIndex = Math.floor(normalizedAngle / anglePerSegment);
+
+            // Check if we've moved to a new segment
+            const isAtBoundary = normalizedAngle % anglePerSegment < 5 || normalizedAngle % anglePerSegment > anglePerSegment - 5;
+            if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
+                // Play click sound only when crossing the boundary of a segment
+                clickSound.currentTime = 0; // Reset sound to the beginning
+                clickSound.play();
+                lastSegmentIndex = currentSegmentIndex; // Update the last segment index
             }
-    
-            const min = 1024;
-            const max = 9999;
-            const deg = Math.floor(Math.random() * (max - min)) + min;
-            canvas.style.transition = "transform 5s ease-out";
-            canvas.style.transform = `rotate(${deg}deg)`;
-    
-            // Play sound
-            let currentTime = 0; // Track elapsed time
-            let isPlaying = false; // Flag to track sound state
-    
-            const getClickInterval = (timeElapsed) => {
-                const normalizedTime = timeElapsed / 5000; // Normalize to spin duration
-                return Math.max(50, 400 * normalizedTime); // Adjust based on speed
-            };
-    
-            const playClicks = () => {
-                if (currentTime < 5000) {
-                    const interval = getClickInterval(currentTime);
-                    if (!isPlaying) {
-                        clickSound.currentTime = 0; // Reset sound to start
-                        clickSound.play(); // Play sound
-                        isPlaying = true; // Mark as playing
-                        setTimeout(() => {
-                            isPlaying = false; // Reset after sound plays
-                        }, interval);
-                    }
-                    currentTime += interval; // Update time
-                    setTimeout(playClicks, interval); // Schedule next sound
-                }
-            };
-    
-            // Show result after spin
-            setTimeout(() => {
-    const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
-    const selectedOption = options[selectedIndex];
-    resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
-    // Modal se nyní nezobrazuje
-}, 5000);
-    
-            playClicks(); // Start playing the clicks
-        });
-    
+        }
+
+        requestAnimationFrame(syncClicks);
+    };
+
+    requestAnimationFrame(syncClicks);
+
+    setTimeout(() => {
+        const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
+        const selectedOption = options[selectedIndex];
+        resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
+    }, 16000);
+});
+
         addButton.addEventListener('click', () => {
             const option = optionInput.value.trim();
             if (option) {
