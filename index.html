@@ -263,51 +263,56 @@
         return;
     }
 
-    const min = 1440;  // 4 otáčky
-    const max = 2520; // 7 otáček
-    const deg = Math.floor(Math.random() * (max - min)) + min;
-
-    // Upravená animace na pomalejší začátek
-    canvas.style.transition = "transform 16s cubic-bezier(0.3, 0.6, 0.2, 1)";
-    canvas.style.transform = `rotate(${deg}deg)`;
-
-    let lastSegmentIndex = null;
-
-    const syncClicks = () => {
-        const currentRotation = getComputedStyle(canvas).transform;
-
-        const matrixValues = currentRotation.match(/matrix\((.+)\)/);
-        if (matrixValues) {
-            const matrix = matrixValues[1].split(', ');
-            const a = parseFloat(matrix[0]);
-            const b = parseFloat(matrix[1]);
-            const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
-
-            const normalizedAngle = (currentAngle + 360) % 360;
-            const anglePerSegment = 360 / options.length;
-            const currentSegmentIndex = Math.floor(normalizedAngle / anglePerSegment);
-
-            // Check if we've moved to a new segment
-            const isAtBoundary = normalizedAngle % anglePerSegment < 5 || normalizedAngle % anglePerSegment > anglePerSegment - 5;
-            if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
-                // Play click sound only when crossing the boundary of a segment
-                clickSound.currentTime = 0; // Reset sound to the beginning
-                clickSound.play();
-                lastSegmentIndex = currentSegmentIndex; // Update the last segment index
-            }
-        }
-
-        requestAnimationFrame(syncClicks);
-    };
-
-    requestAnimationFrame(syncClicks);
+    // Reset rotace před každým novým točením
+    canvas.style.transition = 'none';
+    canvas.style.transform = 'rotate(0deg)';
 
     setTimeout(() => {
-        const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
-        const selectedOption = options[selectedIndex];
-        resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
-    }, 16000);
+        const min = 1080;  // 3 otáčky
+        const max = 2520;  // 7 otáček
+        const deg = Math.floor(Math.random() * (max - min)) + min;
+
+        // Upravená animace na pomalejší začátek
+        canvas.style.transition = "transform 18s cubic-bezier(0.3, 0.6, 0.2, 1)";
+        canvas.style.transform = `rotate(${deg}deg)`;
+
+        let lastSegmentIndex = null;
+
+        const syncClicks = () => {
+            const currentRotation = getComputedStyle(canvas).transform;
+
+            const matrixValues = currentRotation.match(/matrix\((.+)\)/);
+            if (matrixValues) {
+                const matrix = matrixValues[1].split(', ');
+                const a = parseFloat(matrix[0]);
+                const b = parseFloat(matrix[1]);
+                const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
+
+                const normalizedAngle = (currentAngle + 360) % 360;
+                const anglePerSegment = 360 / options.length;
+                const currentSegmentIndex = Math.floor(normalizedAngle / anglePerSegment);
+
+                const isAtBoundary = normalizedAngle % anglePerSegment < 5 || normalizedAngle % anglePerSegment > anglePerSegment - 5;
+                if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
+                    clickSound.currentTime = 0;
+                    clickSound.play();
+                    lastSegmentIndex = currentSegmentIndex;
+                }
+            }
+
+            requestAnimationFrame(syncClicks);
+        };
+
+        requestAnimationFrame(syncClicks);
+
+        setTimeout(() => {
+            const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
+            const selectedOption = options[selectedIndex];
+            resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
+        }, 18000);
+    }, 10); // Krátké zpoždění pro nastavení nové rotace po resetu
 });
+
 
         addButton.addEventListener('click', () => {
             const option = optionInput.value.trim();
@@ -372,7 +377,47 @@
                 modal.style.display = 'none';
             }
         });
-    
+    // Funkce pro uložení možností do localStorage
+function saveOptions() {
+    localStorage.setItem('options', JSON.stringify(options));
+}
+
+// Funkce pro načtení možností z localStorage
+function loadOptions() {
+    const savedOptions = localStorage.getItem('options');
+    if (savedOptions) {
+        options.push(...JSON.parse(savedOptions));
+        renderOptions();
+        drawWheel();
+    }
+}
+
+// Funkce pro přidání nové možnosti
+addButton.addEventListener('click', () => {
+    const option = optionInput.value.trim();
+    if (option) {
+        options.push(option);
+        optionInput.value = '';
+        renderOptions();
+        drawWheel();
+        saveOptions();  // Ulož nové možnosti
+        spinButton.style.display = 'block';
+    }
+});
+
+// Při načtení stránky načteme možnosti
+window.addEventListener('load', () => {
+    loadOptions();
+});
+
+// Při odstranění možnosti také aktualizujeme uložení
+function removeOption(index) {
+    options.splice(index, 1);
+    renderOptions();
+    drawWheel();
+    saveOptions();  // Ulož změny po odstranění
+}
+
         document.getElementById('year').textContent = new Date().getFullYear();
     </script>    
 </body>
