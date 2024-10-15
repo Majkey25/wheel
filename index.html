@@ -172,7 +172,10 @@
         <button id="spinButton">Spin</button>
         
         <h2 id="optionsHeader" style="display: none;">Options:</h2>
-        <ul id="optionsList" style="display: none;"></ul>            
+        <ul id="optionsList" style="display: none;"></ul>  
+        <h2>Manage Options</h2>
+    <button id="importButton">Import data</button>
+    <button id="exportButton">Export data</button>          
     </div>
 
     <div id="wheelContainer">
@@ -377,46 +380,25 @@
                 modal.style.display = 'none';
             }
         });
-    // Funkce pro uložení možností do localStorage
-function saveOptions() {
-    localStorage.setItem('options', JSON.stringify(options));
-}
-
-// Funkce pro načtení možností z localStorage
-function loadOptions() {
-    const savedOptions = localStorage.getItem('options');
-    if (savedOptions) {
-        options.push(...JSON.parse(savedOptions));
+   // Import Options
+document.getElementById('importButton').addEventListener('click', () => {
+    const importedOptions = prompt("Paste your options (comma-separated):");
+    if (importedOptions) {
+        options.length = 0;  // Clear existing options
+        importedOptions.split(',').forEach(option => {
+            options.push(option.trim());
+        });
         renderOptions();
         drawWheel();
     }
-}
-
-// Funkce pro přidání nové možnosti
-addButton.addEventListener('click', () => {
-    const option = optionInput.value.trim();
-    if (option) {
-        options.push(option);
-        optionInput.value = '';
-        renderOptions();
-        drawWheel();
-        saveOptions();  // Ulož nové možnosti
-        spinButton.style.display = 'block';
-    }
 });
 
-// Při načtení stránky načteme možnosti
-window.addEventListener('load', () => {
-    loadOptions();
+// Export Options
+document.getElementById('exportButton').addEventListener('click', () => {
+    const exportedOptions = options.join(', ');
+    alert(`${exportedOptions}`);
 });
 
-// Při odstranění možnosti také aktualizujeme uložení
-function removeOption(index) {
-    options.splice(index, 1);
-    renderOptions();
-    drawWheel();
-    saveOptions();  // Ulož změny po odstranění
-}
 
         document.getElementById('year').textContent = new Date().getFullYear();
     </script>    
