@@ -154,20 +154,16 @@
             justify-content: center; /* Center the items */
             gap: 10px; /* Space between paragraphs */
         }
-        .arrow-button {
-            background-color: transparent; /* Remove background color */
-            color: #28a745; /* Use a sleek green for the arrow */
-            border: none; /* Remove border */
+     
+        .toggle-button {
+            background-color: transparent; /* Keep the background transparent */
+            color: #000000; /* Set the text color to match the theme */
+            border: none; /* Remove the border */
             cursor: pointer;
-            padding: 0 10px; /* Minimal padding */
-            font-size: 24px; /* Larger font size for modern feel */
-            transition: transform 0.2s ease, color 0.2s ease; /* Smooth transition */
-            outline: none; /* Remove focus outline */
-        }
-
-        .arrow-button:hover {
-            color: #000000; /* Slightly darker green on hover */
-            transform: scale(1.1); /* Subtle grow effect */
+            padding: 0 10px; /* Add some horizontal padding */
+            font-size: 18px; /* Font size for visibility */
+            transition: color 0.2s ease; /* Smooth transition for color */
+            outline: none; /* Remove outline on focus */
         }
 
         .arrow-button:focus {
@@ -203,11 +199,12 @@
         <button id="addButton">Add option</button>
         <button id="spinButton">Spin</button>
         
-        <h2 id="optionsHeader" style="display: block;">
+        <h2 id="optionsHeader" style="display: flex; align-items: center;">
             Options:
-            <button id="toggleOptionsButton" class="arrow-button">▶</button>
+            <button id="toggleOptionsButton" class="toggle-button">Show/Hide</button>
         </h2>
-        <ul id="optionsList" style="display: none;"></ul>
+        <ul id="optionsList" style="display: none;"></ul>       
+             
         <h2>Manage Options</h2>
     <button id="importButton">Import data</button>
     <button id="exportButton">Export data</button>          
@@ -448,14 +445,17 @@ generateRandomNumberButton.addEventListener('click', () => {
 });
 const toggleOptionsButton = document.getElementById('toggleOptionsButton');
 let optionsVisible = false; // Initial state for hiding options
-toggleOptionsButton.innerText = '▶'; // Right arrow for hidden options
+
+// Ensure the button reflects the initial state
+toggleOptionsButton.innerText = 'Show/Hide'; // Initial text when options are hidden
+
 toggleOptionsButton.addEventListener('click', () => {
     if (optionsVisible) {
         optionsList.style.display = 'none'; // Hide options list
-        toggleOptionsButton.innerText = '▶';
+        
     } else {
         optionsList.style.display = 'block'; // Show options list
-        toggleOptionsButton.innerText = '▼';
+        
     }
     optionsVisible = !optionsVisible; // Toggle the visibility state
 });
