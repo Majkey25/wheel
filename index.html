@@ -103,7 +103,18 @@
             border-radius: 8px;
             text-align: center;
         }
+        .close-rng {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
 
+        .close-rng:hover,
+        .close-rng:focus {
+            color: rgb(255, 0, 0);
+            cursor: pointer;
+        }
         .close {
             color: #aaa;
             float: right;
@@ -160,7 +171,21 @@
 </head>
 <body>
     <div class="menu">
-        <h1>Random Selection</h1>
+        <h2>Number Generator</h2>
+        <button id="openRandomNumberModal">Open Generator</button>
+        <div id="randomNumberModal" class="modal">
+            <div class="modal-content">
+                <span class="close-rng">&times;</span>
+                <h2>Generate Random Number</h2>
+                <label for="minNumber">Min:</label>
+                <input type="number" id="minNumber" value="1">
+                <label for="maxNumberRNG">Max:</label>
+                <input type="number" id="maxNumberRNG" value="10">
+                <button id="generateRandomNumber">Generate</button>
+                <div id="randomNumberResult"></div>
+            </div>
+        </div>
+        <h1>Spin the Wheel</h1>
 
         <h2>Number Range</h2>
         <input type="number" id="maxNumber" placeholder="Maximum number">
@@ -399,8 +424,44 @@ document.getElementById('exportButton').addEventListener('click', () => {
     alert(`${exportedOptions}`);
 });
 
+// Random Number Generator Logic
+const randomNumberModal = document.getElementById('randomNumberModal');
+const openRandomNumberModal = document.getElementById('openRandomNumberModal');
+const closeRNG = document.getElementsByClassName('close-rng')[0];
+const generateRandomNumberButton = document.getElementById('generateRandomNumber');
+const randomNumberResult = document.getElementById('randomNumberResult');
 
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>    
+// Open the modal when the button is clicked
+openRandomNumberModal.addEventListener('click', () => {
+    randomNumberModal.style.display = 'block';
+});
+
+// Close the modal when the close button is clicked
+closeRNG.addEventListener('click', () => {
+    randomNumberModal.style.display = 'none';
+});
+
+// Close the modal if clicking outside the modal content
+window.addEventListener('click', (event) => {
+    if (event.target === randomNumberModal) {
+        randomNumberModal.style.display = 'none';
+    }
+});
+
+// Generate a random number within the specified range
+generateRandomNumberButton.addEventListener('click', () => {
+    const min = parseInt(document.getElementById('minNumber').value);
+    const max = parseInt(document.getElementById('maxNumberRNG').value);
+    if (min < max) {
+        const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+        randomNumberResult.innerText = `Random Number: ${randomNumber}`;
+    } else {
+        randomNumberResult.innerText = "Invalid range. Make sure min < max.";
+    }
+});
+
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+ 
 </body>
 </html>
