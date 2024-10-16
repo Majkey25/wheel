@@ -103,18 +103,7 @@
             border-radius: 8px;
             text-align: center;
         }
-        .close-rng {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
 
-        .close-rng:hover,
-        .close-rng:focus {
-            color: rgb(255, 0, 0);
-            cursor: pointer;
-        }
         .close {
             color: #aaa;
             float: right;
@@ -166,6 +155,21 @@
             text-align: center;
             width: 100%; /* Šipka bude na střed */
         }
+        .arrow-button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        padding: 5px 10px;
+        font-size: 18px;
+        margin-left: 10px;
+    }
+
+    .arrow-button:hover {
+        background-color: #218838;
+    }
+
 
     </style>
 </head>
@@ -175,7 +179,7 @@
         <button id="openRandomNumberModal">Open Generator</button>
         <div id="randomNumberModal" class="modal">
             <div class="modal-content">
-                <span class="close-rng">&times;</span>
+                <span class="close">&times;</span>
                 <h2>Generate Random Number</h2>
                 <label for="minNumber">Min:</label>
                 <input type="number" id="minNumber" value="1">
@@ -209,18 +213,6 @@
         </div>
         <canvas id="wheel" width="800" height="800"></canvas>
     </div>      
-
-    <!-- Modal Window -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Selected Option:</h2>
-            <div id="result"></div>
-        </div>
-    </div>
-    
-
-    
     <footer style="display: flex; justify-content: center; align-items: center; text-align: center;">
         <a href="https://majkey25.github.io/Majkey25/" style="text-decoration: none; color: inherit;">
             <p style="margin: 1;">Made by Matěj Teplý &copy; <span id="year"></span> All rights reserved.</p>
@@ -233,7 +225,6 @@
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const spinButton = document.getElementById('spinButton');
-        const modal = document.getElementById('modal');
         const resultDiv = document.getElementById('result');
         const closeModal = document.getElementsByClassName('close')[0];
         const optionInput = document.getElementById('optionInput');
@@ -427,7 +418,7 @@ document.getElementById('exportButton').addEventListener('click', () => {
 // Random Number Generator Logic
 const randomNumberModal = document.getElementById('randomNumberModal');
 const openRandomNumberModal = document.getElementById('openRandomNumberModal');
-const closeRNG = document.getElementsByClassName('close-rng')[0];
+const closeRNG = document.getElementsByClassName('close')[0];
 const generateRandomNumberButton = document.getElementById('generateRandomNumber');
 const randomNumberResult = document.getElementById('randomNumberResult');
 
