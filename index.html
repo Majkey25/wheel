@@ -438,7 +438,7 @@ generateRandomNumberButton.addEventListener('click', () => {
     const max = parseInt(document.getElementById('maxNumberRNG').value);
     if (min < max) {
         const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-        randomNumberResult.innerText = `Random Number: ${randomNumber}`;
+        randomNumberResult.innerText = `Generated Number: ${randomNumber}`;
     } else {
         randomNumberResult.innerText = "Invalid range. Make sure min < max.";
     }
@@ -451,15 +451,12 @@ toggleOptionsButton.innerText = 'Show/Hide'; // Initial text when options are hi
 
 toggleOptionsButton.addEventListener('click', () => {
     if (optionsVisible) {
-        optionsList.style.display = 'none'; // Hide options list
-        
+        optionsList.style.display = 'none'; // Hide options list  
     } else {
         optionsList.style.display = 'block'; // Show options list
-        
     }
     optionsVisible = !optionsVisible; // Toggle the visibility state
 });
-
 
 document.getElementById('year').textContent = new Date().getFullYear();
 </script>
