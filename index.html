@@ -225,7 +225,7 @@
     
 
     <script>
-        const options = [];
+        const options = JSON.parse(localStorage.getItem('wheelOptions')) || []; // Load saved options from localStorage or initialize as empty array
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const spinButton = document.getElementById('spinButton');
