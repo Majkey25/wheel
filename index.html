@@ -464,40 +464,40 @@ toggleOptionsButton.addEventListener('click', () => {
     }
 
     function renderOptions() {
-        optionsList.innerHTML = '';
-        options.forEach((option, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <input type="text" value="${option}" onchange="updateOption(${index}, this.value)">
-                <button class="remove-button" onclick="removeOption(${index})">&times;</button>
-            `;
-            optionsList.appendChild(li);
-        });
+    optionsList.innerHTML = '';
+    options.forEach((option, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <input type="text" value="${option}" onchange="updateOption(${index}, this.value)">
+            <button class="remove-button" onclick="removeOption(${index})">&times;</button>
+        `;
+        optionsList.appendChild(li);
+    });
 
-        // Save options after rendering
-        saveOptions();
+    // Save options after rendering
+    saveOptions();
 
-        if (options.length > 0) {
-            optionsList.style.display = 'block';
-            optionsHeader.style.display = 'block';
-        } else {
-            optionsList.style.display = 'none';
-            optionsHeader.style.display = 'none';
-        }
+    if (options.length > 0) {
+        optionsList.style.display = 'block';
+        optionsHeader.style.display = 'block';
+    } else {
+        optionsList.style.display = 'none';
+        optionsHeader.style.display = 'none';
     }
+}
+
 
     function updateOption(index, value) {
-        options[index] = value;
-        renderOptions();
-        drawWheel();
-    }
+    options[index] = value;
+    renderOptions(); // This will call saveOptions as part of the rendering process
+    drawWheel();
+}
 
-    function removeOption(index) {
-        options.splice(index, 1);
-        renderOptions();
-        drawWheel();
-    }
-
+function removeOption(index) {
+    options.splice(index, 1);
+    renderOptions(); // This will call saveOptions as part of the rendering process
+    drawWheel();
+}
     // Import Options
     document.getElementById('importButton').addEventListener('click', () => {
         const importedOptions = prompt("Paste your options (comma-separated):");
