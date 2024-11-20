@@ -225,195 +225,265 @@
     
 
     <script>
-        // Load saved options from localStorage or initialize as an empty array
-        const options = JSON.parse(localStorage.getItem('wheelOptions')) || []; 
-        const canvas = document.getElementById('wheel');
-        const ctx = canvas.getContext('2d');
-        const spinButton = document.getElementById('spinButton');
-        const optionInput = document.getElementById('optionInput');
-        const addButton = document.getElementById('addButton');
-        const optionsList = document.getElementById('optionsList');
-        const optionsHeader = document.getElementById('optionsHeader');
-        
-        // Load sound
-        const clickSound = new Audio('media/click.wav');
-    
-        // Draw the wheel with current options
-        function drawWheel() {
-            const numOptions = options.length;
-            if (numOptions === 0) return;
-    
-            const angle = (2 * Math.PI) / numOptions;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2); // Center of rotation
-    
-            const radius = 350;
-            const textRadius = 300;
-            for (let i = 0; i < numOptions; i++) {
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
-    
-                ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`;
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.stroke();
-    
-                ctx.fillStyle = '#000';
-                ctx.font = "bold 30px 'Lato', sans-serif";
-                const text = options[i];
-                const textWidth = ctx.measureText(text).width;
-                const textHeight = 30;
-    
-                ctx.fillText(text,
-                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
-                    textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2
-                );
-            }
-    
-            ctx.restore();
+    // Load saved options from localStorage or initialize as an empty array
+    const options = JSON.parse(localStorage.getItem('wheelOptions')) || [];
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const spinButton = document.getElementById('spinButton');
+    const optionInput = document.getElementById('optionInput');
+    const addButton = document.getElementById('addButton');
+    const optionsList = document.getElementById('optionsList');
+    const optionsHeader = document.getElementById('optionsHeader');
+    const resultDiv = document.getElementById('result');
+    const clickSound = new Audio('media/click.wav');
+
+    optionsList.style.display = 'none';
+    optionsHeader.style.display = 'none';
+
+    // Draw the wheel with current options
+    function drawWheel() {
+        const numOptions = options.length;
+        if (numOptions === 0) return;
+
+        const angle = (2 * Math.PI) / numOptions;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2); // Center of rotation
+
+        const radius = 350;
+        const textRadius = 300;
+        for (let i = 0; i < numOptions; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
+
+            ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
+
+            ctx.fillStyle = '#000';
+            ctx.font = "bold 30px 'Lato', sans-serif";
+            const text = options[i];
+            const textWidth = ctx.measureText(text).width;
+            const textHeight = 30;
+
+            ctx.fillText(text,
+                textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
+                textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2
+            );
         }
-    
-        // Handle spinning the wheel
-        spinButton.addEventListener('click', () => {
-            if (options.length <= 1) {
-                alert("You must have at least 2 options to spin the wheel.");
-                return;
-            }
-    
-            // Reset rotation before each spin
-            canvas.style.transition = 'none';
-            canvas.style.transform = 'rotate(0deg)';
-    
-            setTimeout(() => {
-                const min = 613;
-                const max = 2913;
-                const deg = Math.floor(Math.random() * (max - min)) + min;
-    
-                canvas.style.transition = "transform 18s cubic-bezier(0.3, 0.6, 0.2, 1)";
-                canvas.style.transform = `rotate(${deg}deg)`;
-    
-                let lastSegmentIndex = null;
-    
-                const syncClicks = () => {
-                    const currentRotation = getComputedStyle(canvas).transform;
-                    const matrixValues = currentRotation.match(/matrix\((.+)\)/);
-                    if (matrixValues) {
-                        const matrix = matrixValues[1].split(', ');
-                        const a = parseFloat(matrix[0]);
-                        const b = parseFloat(matrix[1]);
-                        const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
-    
-                        const normalizedAngle = (currentAngle + 360) % 360;
-                        const anglePerSegment = 360 / options.length;
-                        const currentSegmentIndex = Math.floor(normalizedAngle / anglePerSegment);
-    
-                        const isAtBoundary = normalizedAngle % anglePerSegment < 5 || normalizedAngle % anglePerSegment > anglePerSegment - 5;
-                        if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
-                            clickSound.currentTime = 0;
-                            clickSound.play();
-                            lastSegmentIndex = currentSegmentIndex;
-                        }
+
+        ctx.restore();
+    }
+
+    // Handle spinning the wheel
+    spinButton.addEventListener('click', () => {
+        if (options.length <= 1) {
+            alert("You must have at least 2 options to spin the wheel.");
+            return;
+        }
+
+        // Reset rotation before each spin
+        canvas.style.transition = 'none';
+        canvas.style.transform = 'rotate(0deg)';
+
+        setTimeout(() => {
+            const min = 613;
+            const max = 2913;
+            const deg = Math.floor(Math.random() * (max - min)) + min;
+
+            canvas.style.transition = "transform 18s cubic-bezier(0.3, 0.6, 0.2, 1)";
+            canvas.style.transform = `rotate(${deg}deg)`;
+
+            let lastSegmentIndex = null;
+
+            const syncClicks = () => {
+                const currentRotation = getComputedStyle(canvas).transform;
+                const matrixValues = currentRotation.match(/matrix\((.+)\)/);
+                if (matrixValues) {
+                    const matrix = matrixValues[1].split(', ');
+                    const a = parseFloat(matrix[0]);
+                    const b = parseFloat(matrix[1]);
+                    const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
+
+                    const normalizedAngle = (currentAngle + 360) % 360;
+                    const anglePerSegment = 360 / options.length;
+                    const currentSegmentIndex = Math.floor(normalizedAngle / anglePerSegment);
+
+                    const isAtBoundary = normalizedAngle % anglePerSegment < 5 || normalizedAngle % anglePerSegment > anglePerSegment - 5;
+                    if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
+                        clickSound.currentTime = 0;
+                        clickSound.play();
+                        lastSegmentIndex = currentSegmentIndex;
                     }
-    
-                    requestAnimationFrame(syncClicks);
-                };
-    
+                }
+
                 requestAnimationFrame(syncClicks);
-    
-                setTimeout(() => {
-                    const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
-                    const selectedOption = options[selectedIndex];
-                    resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
-                }, 18000);
-            }, 10);
-        });
-    
-        // Add new option
-        addButton.addEventListener('click', () => {
-            const option = optionInput.value.trim();
-            if (option) {
-                options.push(option);
-                optionInput.value = '';
-                renderOptions();
-                drawWheel();
-            }
-        });
-    
-        // Render options list to the menu
-        function renderOptions() {
-            optionsList.innerHTML = '';
-            options.forEach((option, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <input type="text" value="${option}" onchange="updateOption(${index}, this.value)">
-                    <button class="remove-button" onclick="removeOption(${index})">&times;</button>
-                `;
-                optionsList.appendChild(li);
-            });
-    
-            // Save options to localStorage after rendering
-            saveOptions();
-    
-            if (options.length > 0) {
-                optionsList.style.display = 'block';
-                optionsHeader.style.display = 'block';
-            } else {
-                optionsList.style.display = 'none';
-                optionsHeader.style.display = 'none';
-            }
-        }
-    
-        // Save options to localStorage
-        function saveOptions() {
-            localStorage.setItem('wheelOptions', JSON.stringify(options));
-        }
-    
-        // Update an existing option
-        function updateOption(index, value) {
-            options[index] = value;
-            renderOptions(); // Save options after update
-            drawWheel();
-        }
-    
-        // Remove an option
-        function removeOption(index) {
-            options.splice(index, 1);
-            renderOptions(); // Save options after removal
-            drawWheel();
-        }
-    
-        // Import options
-        document.getElementById('importButton').addEventListener('click', () => {
-            const importedOptions = prompt("Paste your options (comma-separated):");
-            if (importedOptions) {
-                options.length = 0;  // Clear existing options
-                importedOptions.split(',').forEach(option => {
-                    options.push(option.trim());
-                });
-                renderOptions();
-                drawWheel();
-            }
-        });
-    
-        // Export options
-        document.getElementById('exportButton').addEventListener('click', () => {
-            const exportedOptions = options.join(', ');
-            alert(`${exportedOptions}`);
-        });
-    
-        // Clear saved options
-        document.getElementById('clearOptionsButton').addEventListener('click', () => {
-            localStorage.removeItem('wheelOptions');
-            options.length = 0;
+            };
+
+            requestAnimationFrame(syncClicks);
+
+            setTimeout(() => {
+                const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
+                const selectedOption = options[selectedIndex];
+                resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
+            }, 18000);
+        }, 10);
+    });
+
+    // Add new option
+    addButton.addEventListener('click', () => {
+        const option = optionInput.value.trim();
+        if (option) {
+            options.push(option);
+            optionInput.value = '';
             renderOptions();
             drawWheel();
+        }
+    });
+
+    // Render options list to the menu
+    function renderOptions() {
+        optionsList.innerHTML = '';
+        options.forEach((option, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <input type="text" value="${option}" onchange="updateOption(${index}, this.value)">
+                <button class="remove-button" onclick="removeOption(${index})">&times;</button>
+            `;
+            optionsList.appendChild(li);
         });
-    
-        // Initialize the page by rendering options and drawing the wheel
+
+        // Save options to localStorage after rendering
+        saveOptions();
+
+        if (options.length > 0) {
+            optionsList.style.display = 'block';
+            optionsHeader.style.display = 'block';
+        } else {
+            optionsList.style.display = 'none';
+            optionsHeader.style.display = 'none';
+        }
+    }
+
+    // Save options to localStorage
+    function saveOptions() {
+        localStorage.setItem('wheelOptions', JSON.stringify(options));
+    }
+
+    // Update an existing option
+    function updateOption(index, value) {
+        options[index] = value;
+        renderOptions(); // Save options after update
+        drawWheel();
+    }
+
+    // Remove an option
+    function removeOption(index) {
+        options.splice(index, 1);
+        renderOptions(); // Save options after removal
+        drawWheel();
+    }
+
+    // Import options
+    document.getElementById('importButton').addEventListener('click', () => {
+        const importedOptions = prompt("Paste your options (comma-separated):");
+        if (importedOptions) {
+            options.length = 0;  // Clear existing options
+            importedOptions.split(',').forEach(option => {
+                options.push(option.trim());
+            });
+            renderOptions();
+            drawWheel();
+        }
+    });
+
+    // Export options
+    document.getElementById('exportButton').addEventListener('click', () => {
+        const exportedOptions = options.join(', ');
+        alert(`${exportedOptions}`);
+    });
+
+    // Clear saved options
+    document.getElementById('clearOptionsButton').addEventListener('click', () => {
+        localStorage.removeItem('wheelOptions');
+        options.length = 0;
         renderOptions();
         drawWheel();
+    });
+
+    // Initialize the page by rendering options and drawing the wheel
+    renderOptions();
+    drawWheel();
+
+    // Random Number Generator Logic
+    const randomNumberModal = document.getElementById('randomNumberModal');
+    const openRandomNumberModal = document.getElementById('openRandomNumberModal');
+    const closeRNG = document.getElementsByClassName('close')[0];
+    const generateRandomNumberButton = document.getElementById('generateRandomNumber');
+    const randomNumberResult = document.getElementById('randomNumberResult');
+
+    // Open the modal when the button is clicked
+    openRandomNumberModal.addEventListener('click', () => {
+        randomNumberModal.style.display = 'block';
+    });
+
+    // Close the modal when the close button is clicked
+    closeRNG.addEventListener('click', () => {
+        randomNumberModal.style.display = 'none';
+    });
+
+    // Close the modal if clicking outside the modal content
+    window.addEventListener('click', (event) => {
+        if (event.target === randomNumberModal) {
+            randomNumberModal.style.display = 'none';
+        }
+    });
+
+    // Generate a random number within the specified range
+    generateRandomNumberButton.addEventListener('click', () => {
+        const min = parseInt(document.getElementById('minNumber').value);
+        const max = parseInt(document.getElementById('maxNumberRNG').value);
+        if (min < max) {
+            const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+            randomNumberResult.innerText = `Generated Number: ${randomNumber}`;
+        } else {
+            randomNumberResult.innerText = "Invalid range. Make sure min < max.";
+        }
+    });
+
+    // Show/Hide options list logic
+    const toggleOptionsButton = document.getElementById('toggleOptionsButton');
+    let optionsVisible = false;
+
+    toggleOptionsButton.innerText = 'Show/Hide';
+
+    toggleOptionsButton.addEventListener('click', () => {
+        if (optionsVisible) {
+            optionsList.style.display = 'none'; // Hide options list  
+        } else {
+            optionsList.style.display = 'block'; // Show options list
+        }
+        optionsVisible = !optionsVisible; // Toggle the visibility state
+    });
+
+    // Set year dynamically
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('generateRange').addEventListener('click', () => {
+    const maxNumber = parseInt(document.getElementById('maxNumber').value);
+    if (maxNumber && maxNumber > 0) {
+        options.length = 0; // Clear previous options
+        for (let i = 1; i <= maxNumber; i++) {
+            options.push(i.toString());
+        }
+        renderOptions();
+        drawWheel();
+    } else {
+        alert("Please enter a valid number greater than 0");
+    }
+});
+
     </script>    
 </body>
 </html>
