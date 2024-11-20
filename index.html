@@ -207,7 +207,8 @@
              
         <h2>Manage Options</h2>
     <button id="importButton">Import data</button>
-    <button id="exportButton">Export data</button>          
+    <button id="exportButton">Export data</button> 
+    <button id="clearOptionsButton">Clear Saved Options</button>         
     </div>
 
     <div id="wheelContainer">
@@ -457,7 +458,72 @@ toggleOptionsButton.addEventListener('click', () => {
     }
     optionsVisible = !optionsVisible; // Toggle the visibility state
 });
+    // Save options to localStorage
+    function saveOptions() {
+        localStorage.setItem('wheelOptions', JSON.stringify(options));
+    }
 
+    function renderOptions() {
+        optionsList.innerHTML = '';
+        options.forEach((option, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <input type="text" value="${option}" onchange="updateOption(${index}, this.value)">
+                <button class="remove-button" onclick="removeOption(${index})">&times;</button>
+            `;
+            optionsList.appendChild(li);
+        });
+
+        // Save options after rendering
+        saveOptions();
+
+        if (options.length > 0) {
+            optionsList.style.display = 'block';
+            optionsHeader.style.display = 'block';
+        } else {
+            optionsList.style.display = 'none';
+            optionsHeader.style.display = 'none';
+        }
+    }
+
+    function updateOption(index, value) {
+        options[index] = value;
+        renderOptions();
+        drawWheel();
+    }
+
+    function removeOption(index) {
+        options.splice(index, 1);
+        renderOptions();
+        drawWheel();
+    }
+
+    // Import Options
+    document.getElementById('importButton').addEventListener('click', () => {
+        const importedOptions = prompt("Paste your options (comma-separated):");
+        if (importedOptions) {
+            options.length = 0;  // Clear existing options
+            importedOptions.split(',').forEach(option => {
+                options.push(option.trim());
+            });
+            renderOptions();
+            drawWheel();
+        }
+    });
+
+    // Export Options
+    document.getElementById('exportButton').addEventListener('click', () => {
+        const exportedOptions = options.join(', ');
+        alert(`${exportedOptions}`);
+    });
+
+    // Clear Saved Options
+    document.getElementById('clearOptionsButton').addEventListener('click', () => {
+        localStorage.removeItem('wheelOptions');
+        options.length = 0;
+        renderOptions();
+        drawWheel();
+    });
 document.getElementById('year').textContent = new Date().getFullYear();
 </script>
  
