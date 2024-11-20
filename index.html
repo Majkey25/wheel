@@ -225,96 +225,90 @@
     
 
     <script>
-        const options = JSON.parse(localStorage.getItem('wheelOptions')) || []; // Load saved options from localStorage or initialize as empty array
+        // Load saved options from localStorage or initialize as an empty array
+        const options = JSON.parse(localStorage.getItem('wheelOptions')) || []; 
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const spinButton = document.getElementById('spinButton');
-        const resultDiv = document.getElementById('result');
-        const closeModal = document.getElementsByClassName('close')[0];
         const optionInput = document.getElementById('optionInput');
         const addButton = document.getElementById('addButton');
         const optionsList = document.getElementById('optionsList');
         const optionsHeader = document.getElementById('optionsHeader');
         
-        optionsList.style.display = 'none';
-        optionsHeader.style.display = 'none';
-        
         // Load sound
         const clickSound = new Audio('media/click.wav');
-        
+    
+        // Draw the wheel with current options
         function drawWheel() {
             const numOptions = options.length;
             if (numOptions === 0) return;
-        
+    
             const angle = (2 * Math.PI) / numOptions;
-        
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2); // Center of rotation
-        
-            const radius = 350; // Radius for wheel segments
-            const textRadius = 300; // Radius for text, closer to the center of the wheel
+    
+            const radius = 350;
+            const textRadius = 300;
             for (let i = 0; i < numOptions; i++) {
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
                 ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
-        
+    
                 ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`;
                 ctx.fill();
                 ctx.strokeStyle = '#fff';
                 ctx.stroke();
-        
+    
                 ctx.fillStyle = '#000';
                 ctx.font = "bold 30px 'Lato', sans-serif";
-        
                 const text = options[i];
                 const textWidth = ctx.measureText(text).width;
                 const textHeight = 30;
-        
+    
                 ctx.fillText(text,
                     textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
                     textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2
                 );
             }
-        
+    
             ctx.restore();
         }
-        
+    
+        // Handle spinning the wheel
         spinButton.addEventListener('click', () => {
             if (options.length <= 1) {
                 alert("You must have at least 2 options to spin the wheel.");
                 return;
             }
-        
+    
             // Reset rotation before each spin
             canvas.style.transition = 'none';
             canvas.style.transform = 'rotate(0deg)';
-        
+    
             setTimeout(() => {
-                const min = 613;  // 2 turns
-                const max = 2913;  // 7 turns
+                const min = 613;
+                const max = 2913;
                 const deg = Math.floor(Math.random() * (max - min)) + min;
-        
-                // Smooth animation
+    
                 canvas.style.transition = "transform 18s cubic-bezier(0.3, 0.6, 0.2, 1)";
                 canvas.style.transform = `rotate(${deg}deg)`;
-        
+    
                 let lastSegmentIndex = null;
-        
+    
                 const syncClicks = () => {
                     const currentRotation = getComputedStyle(canvas).transform;
-        
                     const matrixValues = currentRotation.match(/matrix\((.+)\)/);
                     if (matrixValues) {
                         const matrix = matrixValues[1].split(', ');
                         const a = parseFloat(matrix[0]);
                         const b = parseFloat(matrix[1]);
                         const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
-        
+    
                         const normalizedAngle = (currentAngle + 360) % 360;
                         const anglePerSegment = 360 / options.length;
                         const currentSegmentIndex = Math.floor(normalizedAngle / anglePerSegment);
-        
+    
                         const isAtBoundary = normalizedAngle % anglePerSegment < 5 || normalizedAngle % anglePerSegment > anglePerSegment - 5;
                         if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
                             clickSound.currentTime = 0;
@@ -322,20 +316,21 @@
                             lastSegmentIndex = currentSegmentIndex;
                         }
                     }
-        
+    
                     requestAnimationFrame(syncClicks);
                 };
-        
+    
                 requestAnimationFrame(syncClicks);
-        
+    
                 setTimeout(() => {
                     const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
                     const selectedOption = options[selectedIndex];
-                    resultDiv.innerText = `Selected option: ${selectedOption}`;
+                    resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
                 }, 18000);
-            }, 10); // Short delay before setting new rotation after reset
+            }, 10);
         });
-        
+    
+        // Add new option
         addButton.addEventListener('click', () => {
             const option = optionInput.value.trim();
             if (option) {
@@ -343,22 +338,10 @@
                 optionInput.value = '';
                 renderOptions();
                 drawWheel();
-                spinButton.style.display = 'block';
             }
         });
-        
-        document.getElementById('generateRange').addEventListener('click', () => {
-            const maxNumber = parseInt(document.getElementById('maxNumber').value);
-            if (maxNumber && maxNumber > 0) {
-                options.length = 0;
-                for (let i = 1; i <= maxNumber; i++) {
-                    options.push(i.toString());
-                }
-                renderOptions();
-                drawWheel();
-            }
-        });
-        
+    
+        // Render options list to the menu
         function renderOptions() {
             optionsList.innerHTML = '';
             options.forEach((option, index) => {
@@ -369,10 +352,10 @@
                 `;
                 optionsList.appendChild(li);
             });
-        
-            // Save options after rendering
+    
+            // Save options to localStorage after rendering
             saveOptions();
-        
+    
             if (options.length > 0) {
                 optionsList.style.display = 'block';
                 optionsHeader.style.display = 'block';
@@ -381,20 +364,27 @@
                 optionsHeader.style.display = 'none';
             }
         }
-        
+    
+        // Save options to localStorage
+        function saveOptions() {
+            localStorage.setItem('wheelOptions', JSON.stringify(options));
+        }
+    
+        // Update an existing option
         function updateOption(index, value) {
             options[index] = value;
-            renderOptions(); // This will call saveOptions as part of the rendering process
+            renderOptions(); // Save options after update
             drawWheel();
         }
-        
+    
+        // Remove an option
         function removeOption(index) {
             options.splice(index, 1);
-            renderOptions(); // This will call saveOptions as part of the rendering process
+            renderOptions(); // Save options after removal
             drawWheel();
         }
-        
-        // Import Options
+    
+        // Import options
         document.getElementById('importButton').addEventListener('click', () => {
             const importedOptions = prompt("Paste your options (comma-separated):");
             if (importedOptions) {
@@ -406,40 +396,24 @@
                 drawWheel();
             }
         });
-        
-        // Export Options
+    
+        // Export options
         document.getElementById('exportButton').addEventListener('click', () => {
             const exportedOptions = options.join(', ');
             alert(`${exportedOptions}`);
         });
-        
-        // Clear Saved Options
+    
+        // Clear saved options
         document.getElementById('clearOptionsButton').addEventListener('click', () => {
             localStorage.removeItem('wheelOptions');
             options.length = 0;
             renderOptions();
             drawWheel();
         });
-        
-        // Save options to localStorage
-        function saveOptions() {
-            localStorage.setItem('wheelOptions', JSON.stringify(options));
-        }
-        
-        const toggleOptionsButton = document.getElementById('toggleOptionsButton');
-        let optionsVisible = false; // Initial state for hiding options
-        
-        toggleOptionsButton.addEventListener('click', () => {
-            if (optionsVisible) {
-                optionsList.style.display = 'none'; // Hide options list  
-            } else {
-                optionsList.style.display = 'block'; // Show options list
-            }
-            optionsVisible = !optionsVisible; // Toggle the visibility state
-        });
-        
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
     
+        // Initialize the page by rendering options and drawing the wheel
+        renderOptions();
+        drawWheel();
+    </script>    
 </body>
 </html>
