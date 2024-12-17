@@ -190,7 +190,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #28a745;
+            background-color: #ff0000;
             transition: 0.4s;
             border-radius: 34px;
         }
@@ -208,7 +208,7 @@
         }
 
         input:checked + .slider {
-            background-color: #ff0000;
+            background-color: #28a745;
         }
 
         input:checked + .slider:before {
@@ -227,7 +227,12 @@
 <body>
     <div class="menu">
         
-
+<!-- Toggle Switch -->
+<label>Classic Wheel</label>
+<label class="switch">
+    <input type="checkbox" id="wheelToggle">
+    <span class="slider"></span>
+</label>
         <h2>Number Generator</h2>
         <button id="openRandomNumberModal">Open Generator</button>
         <div id="randomNumberModal" class="modal">
@@ -263,12 +268,7 @@
     <button id="importButton">Import data</button>
     <button id="exportButton">Export data</button> 
     <button id="clearOptionsButton">Clear Saved Options</button> 
-    <!-- Toggle Switch -->
-    <label>Roulette</label>
-    <label class="switch">
-        <input type="checkbox" id="wheelToggle">
-        <span class="slider"></span>
-    </label>
+    
     </div>
 
     <div id="wheelContainer">
@@ -299,22 +299,20 @@
 
     optionsList.style.display = 'none';
     optionsHeader.style.display = 'none';
-// Function to initialize the wheel based on toggle state
+
 function initializeWheel() {
     const wheelToggle = document.getElementById('wheelToggle');
 
     // Force the toggle to be unchecked
     wheelToggle.checked = false;
 
-    // Draw the Classic wheel first
-    drawClassicWheel();
-
     // Event listener for toggle switch
     wheelToggle.addEventListener('change', () => {
         if (wheelToggle.checked) {
-            drawRouletteWheel();
-        } else {
             drawClassicWheel();
+            
+        } else {
+            drawRouletteWheel();
         }
     });
 }
