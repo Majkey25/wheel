@@ -169,11 +169,65 @@
         .arrow-button:focus {
             outline: none; /* Keep outline removed when focused */
         }
+        /* Toggle Switch Styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #28a745;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #ff0000;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Label for Toggle */
+        label {
+            font-family: Arial, sans-serif;
+            margin-left: 10px;
+            font-size: 30px;
+        }
 
     </style>
 </head>
 <body>
     <div class="menu">
+        
+
         <h2>Number Generator</h2>
         <button id="openRandomNumberModal">Open Generator</button>
         <div id="randomNumberModal" class="modal">
@@ -208,12 +262,18 @@
         <h2>Manage Options</h2>
     <button id="importButton">Import data</button>
     <button id="exportButton">Export data</button> 
-    <button id="clearOptionsButton">Clear Saved Options</button>         
+    <button id="clearOptionsButton">Clear Saved Options</button> 
+    <!-- Toggle Switch -->
+    <label>Roulette</label>
+    <label class="switch">
+        <input type="checkbox" id="wheelToggle">
+        <span class="slider"></span>
+    </label>
     </div>
 
     <div id="wheelContainer">
         <div id="arrow" style="position: absolute; top: 20px; z-index: 1;">
-            <img src="media/red_arrow.png" alt="Arrow" id="arrow" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 50px;">
+            <img src="media/arrow.png" alt="Arrow" id="arrow" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 80px;">
         </div>
         <canvas id="wheel" width="800" height="800"></canvas>
     </div>      
@@ -239,9 +299,33 @@
 
     optionsList.style.display = 'none';
     optionsHeader.style.display = 'none';
+// Function to initialize the wheel based on toggle state
+function initializeWheel() {
+    const wheelToggle = document.getElementById('wheelToggle');
 
-    // Draw the wheel with current options
-    function drawWheel() {
+    // Force the toggle to be unchecked
+    wheelToggle.checked = false;
+
+    // Draw the Classic wheel first
+    drawClassicWheel();
+
+    // Event listener for toggle switch
+    wheelToggle.addEventListener('change', () => {
+        if (wheelToggle.checked) {
+            drawRouletteWheel();
+        } else {
+            drawClassicWheel();
+        }
+    });
+}
+
+// Initial setup: Render options and initialize the wheel
+renderOptions();
+initializeWheel();
+
+
+
+    function drawClassicWheel() {
         const numOptions = options.length;
         if (numOptions === 0) return;
 
@@ -276,6 +360,52 @@
 
         ctx.restore();
     }
+
+
+    function drawRouletteWheel() {
+    const numOptions = options.length + 1; // Přidání jednoho pole pro zelené "znovuotočení"
+    if (numOptions === 0) return;
+
+    const angle = (2 * Math.PI) / numOptions;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2); // Střed otáčení
+
+    const radius = 350;
+    const textRadius = 300;
+
+    for (let i = 0; i < numOptions; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
+
+        // Nastavení barvy: červená, černá, poslední zelená
+        if (i === numOptions - 1) {
+            ctx.fillStyle = '#28a745'; // Zelená pro znovuotočení
+        } else {
+            ctx.fillStyle = i % 2 === 0 ? '#FF0000' : '#000000'; // Střídání červená a černá
+        }
+
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+
+        // Přidání textu
+        ctx.fillStyle = '#fff'; // Bílá pro čitelnost
+        ctx.font = "bold 25px Arial";
+        const text = i === numOptions - 1 ? '' : options[i];
+        const textWidth = ctx.measureText(text).width;
+
+        ctx.fillText(
+            text,
+            textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
+            textRadius * Math.sin(i * angle + angle / 2) + 10
+        );
+    }
+
+    ctx.restore();
+}
+
 
     // Handle spinning the wheel
     spinButton.addEventListener('click', () => {
@@ -339,7 +469,8 @@
             options.push(option);
             optionInput.value = '';
             renderOptions();
-            drawWheel();
+            drawClassicWheel();
+            drawRouletteWheel();
         }
     });
 
@@ -376,14 +507,16 @@
     function updateOption(index, value) {
         options[index] = value;
         renderOptions(); // Save options after update
-        drawWheel();
+        drawClassicWheel();
+        drawRouletteWheel();
     }
 
     // Remove an option
     function removeOption(index) {
         options.splice(index, 1);
         renderOptions(); // Save options after removal
-        drawWheel();
+        drawClassicWheel();
+        drawRouletteWheel();
     }
 
     // Import options
@@ -395,7 +528,8 @@
                 options.push(option.trim());
             });
             renderOptions();
-            drawWheel();
+            drawClassicWheel();
+            drawRouletteWheel();
         }
     });
 
@@ -410,12 +544,14 @@
         localStorage.removeItem('wheelOptions');
         options.length = 0;
         renderOptions();
-        drawWheel();
+        drawClassicWheel();
+        drawRouletteWheel();
     });
 
     // Initialize the page by rendering options and drawing the wheel
     renderOptions();
-    drawWheel();
+    drawClassicWheel();
+    drawRouletteWheel();
 
     // Random Number Generator Logic
     const randomNumberModal = document.getElementById('randomNumberModal');
@@ -478,7 +614,8 @@
             options.push(i.toString());
         }
         renderOptions();
-        drawWheel();
+        drawClassicWheel();
+        drawRouletteWheel();
     } else {
         alert("Please enter a valid number greater than 0");
     }
