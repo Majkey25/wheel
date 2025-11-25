@@ -1,180 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=1024">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Spin The Wheel</title>
     <link rel="icon" sizes="192x192" href="media/logo.png" type="image/png">
     <link rel="icon" sizes="512x512" href="media/logo2.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap"
+          rel="stylesheet">
     <style>
-         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+        :root {
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-stroke: rgba(255, 255, 255, 0.12);
+            --text: #e6ecff;
+            --muted: #b2b8cb;
+            --accent: #7cf2d4;
+            --accent-strong: #7c9dff;
+            --shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            background: radial-gradient(circle at 20% 20%, #1a2746 0%, #0a0d18 40%,
+                                        #05060c 100%);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
             display: flex;
-            justify-content: space-around; /* Space between menu and wheel */
-            align-items: center; /* Center vertically */
-            height: 100vh; /* Full height */
-            margin: 0; /* Remove default margin */
-            overflow: hidden; /* Prevent scrolling */
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            padding: 32px;
+            position: relative;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            width: 640px;
+            height: 640px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.28;
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+
+        body::before {
+            background: #4bc0c8;
+            top: -120px;
+            left: -120px;
+        }
+
+        body::after {
+            background: #6f7bf7;
+            bottom: -180px;
+            right: -120px;
+            animation-delay: 4s;
+        }
+
+        .layout {
+            width: 100%;
+            max-width: 1280px;
+            display: flex;
+            gap: 28px;
+            align-items: flex-start;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-stroke);
+            border-radius: 20px;
+            backdrop-filter: blur(14px);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%,
+                                        rgba(255, 255, 255, 0) 40%);
+            pointer-events: none;
         }
 
         .menu {
-            max-width: 300px; /* Fixed width */
-            width: 300px; /* Set a specific width to prevent shifting */
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow-y: auto; /* Enable vertical scroll if needed */
-            max-height: 80vh; /* Set max height for menu */
-            position: absolute; /* Keep position absolute */
-            left: 0;
+            width: 340px;
+            padding: 22px 22px 18px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            animation: floaty 10s ease-in-out infinite;
         }
 
-        h1, h2 {
+        h1 {
+            margin: 8px 0 18px;
+            font-size: 28px;
+            letter-spacing: 0.4px;
             text-align: center;
         }
 
-        input {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 10px;
+        h2 {
+            margin: 18px 0 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.2px;
+        }
+
+        .group {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .options-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-size: 14px;
+            color: var(--muted);
+            margin-left: 2px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            outline: none;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: rgba(124, 242, 212, 0.8);
+            box-shadow: 0 0 0 4px rgba(124, 242, 212, 0.14);
         }
 
         button {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #28a745;
-            color: white;
+            padding: 12px 14px;
+            border-radius: 12px;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            color: #04101e;
+            background: linear-gradient(120deg, var(--accent-strong), var(--accent));
+            box-shadow: 0 12px 22px rgba(124, 242, 212, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.12),
+                                        rgba(255, 255, 255, 0));
+            transform: translateX(-80%);
+            transition: transform 0.4s ease;
         }
 
         button:hover {
-            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 26px rgba(124, 242, 212, 0.32);
+            filter: brightness(1.03);
+        }
+
+        button:hover::after {
+            transform: translateX(20%);
+        }
+
+        .subtle-button {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            box-shadow: none;
+        }
+
+        .subtle-button:hover {
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.3);
         }
 
         ul {
-            list-style-type: none;
+            list-style: none;
             padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 8px;
         }
 
         li {
-            background: #e9ecef;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 8px;
             display: flex;
-            justify-content: space-between;
-            align-items: center; /* Align items vertically */
+            align-items: center;
+            gap: 8px;
         }
 
-        #wheelContainer {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center the wheel */
-            height: 100%; /* Full height for centering */
-            margin-left: 300px;
-        }
-
-        canvas {
-            border: 10px solid #28a745;
-            border-radius: 50%;
-            display: block;
-            margin: 20px 0; /* Margin above and below */
-            
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 300px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: rgb(255, 0, 0);
-            text-decoration: none;
-            cursor: pointer;
+        li input {
+            flex: 1;
         }
 
         .remove-button {
-            margin-left: 10px;
-            background: transparent;
-            border: none;
-            color: red;
-            cursor: pointer;
-            font-size: 1.2em;
-        }
-        
-        @keyframes fall {
-            0% {
-                transform: translateY(-100vh);
-            }
-            100% {
-                transform: translateY(100vh);
-            }
+            width: auto;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(255, 80, 80, 0.18);
+            color: #ff9f9f;
+            box-shadow: none;
         }
 
-        footer {
-            position: fixed; /* Fixed to the bottom */
-            bottom: 0; /* Positioned at the bottom */
-            left: 0; /* Positioned to the left */
-            width: 100%; /* Width to 100% */
-            text-align: center; /* Center text */
-            background-color: #f4f4f4; /* Footer background */
-            padding: 0px 0; /* Padding top and bottom */
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Shadow above footer */
-            display: flex; /* Flexbox layout */
-            justify-content: center; /* Center the items */
-            gap: 10px; /* Space between paragraphs */
-        }
-     
-        .toggle-button {
-            background-color: transparent; /* Keep the background transparent */
-            color: #000000; /* Set the text color to match the theme */
-            border: none; /* Remove the border */
-            cursor: pointer;
-            padding: 0 10px; /* Add some horizontal padding */
-            font-size: 18px; /* Font size for visibility */
-            transition: color 0.2s ease; /* Smooth transition for color */
-            outline: none; /* Remove outline on focus */
+        .remove-button:hover {
+            filter: brightness(1.1);
         }
 
-        .arrow-button:focus {
-            outline: none; /* Keep outline removed when focused */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
-        /* Toggle Switch Styling */
+
         .switch {
             position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
+            display: inline-flex;
+            width: 70px;
+            height: 36px;
         }
 
         .switch input {
@@ -185,440 +259,573 @@
 
         .slider {
             position: absolute;
+            inset: 0;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ff0000;
-            transition: 0.4s;
-            border-radius: 34px;
+            background: linear-gradient(120deg, #ff6b9c, #ff8566);
+            transition: 0.3s ease;
+            border-radius: 30px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
         }
 
-        .slider:before {
-            position: absolute;
+        .slider::before {
             content: "";
+            position: absolute;
             height: 26px;
             width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.2s;
+            left: 5px;
+            bottom: 5px;
+            background-color: #0b0f1c;
             border-radius: 50%;
+            transition: 0.25s ease;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
         }
 
         input:checked + .slider {
-            background-color: #28a745;
+            background: linear-gradient(120deg, #7cf2d4, #7c9dff);
         }
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        input:checked + .slider::before {
+            transform: translateX(32px);
         }
 
-        /* Label for Toggle */
-        label {
-            font-family: Arial, sans-serif;
-            margin-left: 10px;
-            font-size: 30px;
+        .toggle-button {
+            width: auto;
+            background: none;
+            color: var(--text);
+            padding: 4px 10px;
+            box-shadow: none;
         }
 
+        .toggle-button:hover {
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        #wheelContainer {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            animation: floaty 12s ease-in-out infinite alternate;
+        }
+
+        .wheel-card {
+            width: 100%;
+            padding: 26px 26px 16px;
+        }
+
+        #arrowWrapper {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        #arrowWrapper img {
+            width: 86px;
+            filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.4));
+        }
+
+        canvas {
+            width: min(70vw, 720px);
+            height: auto;
+            border-radius: 50%;
+            display: block;
+            margin: 24px auto 10px;
+            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.06) 0%,
+                                        rgba(255, 255, 255, 0) 60%);
+            border: 12px solid transparent;
+            background-origin: border-box;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4),
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                        0 0 60px rgba(124, 157, 255, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--glass);
+            border: 1px solid var(--glass-stroke);
+            border-radius: 18px;
+            padding: 22px;
+            width: 320px;
+            color: var(--text);
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 16px;
+            top: 10px;
+            font-size: 26px;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #ff9f9f;
+        }
+
+        footer {
+            width: 100%;
+            max-width: 1280px;
+            margin-top: 22px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 0.2px;
+            display: flex;
+            justify-content: center;
+            padding: 8px 0 4px;
+            z-index: 1;
+        }
+
+        footer a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        @keyframes floaty {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes drift {
+            from {
+                transform: translateY(0px) translateX(0px);
+            }
+            to {
+                transform: translateY(-40px) translateX(20px);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .layout {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .menu {
+                width: 100%;
+                max-width: 620px;
+            }
+
+            #wheelContainer {
+                width: 100%;
+            }
+
+            canvas {
+                width: min(90vw, 640px);
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="menu">
-        
-<!-- Toggle Switch -->
-<label>Classic Wheel</label>
-<label class="switch">
-    <input type="checkbox" id="wheelToggle">
-    <span class="slider"></span>
-</label>
-        <h2>Number Generator</h2>
-        <button id="openRandomNumberModal">Open Generator</button>
-        <div id="randomNumberModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Generate Random Number</h2>
-                <label for="minNumber">Min:</label>
-                <input type="number" id="minNumber" value="1">
-                <label for="maxNumberRNG">Max:</label>
-                <input type="number" id="maxNumberRNG" value="15">
-                <button id="generateRandomNumber">Generate</button>
-                <div id="randomNumberResult"></div>
+    <main class="layout">
+        <section class="menu glass-card">
+            <div class="toggle-row">
+                <label>Classic Wheel</label>
+                <label class="switch">
+                    <input type="checkbox" id="wheelToggle">
+                    <span class="slider"></span>
+                </label>
             </div>
-        </div>
-        <h1>Spin the Wheel</h1>
 
-        <h2>Number Range</h2>
-        <input type="number" id="maxNumber" placeholder="Maximum number">
-        <button id="generateRange">Generate numbers</button>
+            <h2>Number Generator</h2>
+            <div class="group">
+                <button id="openRandomNumberModal">Open Generator</button>
+            </div>
+            <div id="randomNumberModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Generate Random Number</h2>
+                    <label for="minNumber">Min:</label>
+                    <input type="number" id="minNumber" value="1">
+                    <label for="maxNumberRNG">Max:</label>
+                    <input type="number" id="maxNumberRNG" value="15">
+                    <button id="generateRandomNumber">Generate</button>
+                    <div id="randomNumberResult"></div>
+                </div>
+            </div>
 
-        <h2>Add Options</h2>
-        <input type="text" id="optionInput" placeholder="Enter option">
-        <button id="addButton">Add option</button>
-        <button id="spinButton">Spin</button>
-        
-        <h2 id="optionsHeader" style="display: flex; align-items: center;">
-            Options:
-            <button id="toggleOptionsButton" class="toggle-button">Show/Hide</button>
-        </h2>
-        <ul id="optionsList" style="display: none;"></ul>       
-             
-        <h2>Manage Options</h2>
-    <button id="importButton">Import data</button>
-    <button id="exportButton">Export data</button> 
-    <button id="clearOptionsButton">Clear Saved Options</button> 
-    
-    </div>
+            <h1>Spin the Wheel</h1>
 
-    <div id="wheelContainer">
-        <div id="arrow" style="position: absolute; top: 20px; z-index: 1;">
-            <img src="media/arrow.png" alt="Arrow" id="arrow" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 80px;">
-        </div>
-        <canvas id="wheel" width="800" height="800"></canvas>
-    </div>      
-    <footer style="display: flex; justify-content: center; align-items: center; text-align: center;">
-        <a href="https://majkey25.github.io/My-website-for-fun/" style="text-decoration: none; color: inherit;">
-            <p style="margin: 1;">Made by Matěj Teplý &copy; <span id="year"></span> All rights reserved.</p>
+            <h2>Number Range</h2>
+            <div class="group">
+                <input type="number" id="maxNumber" placeholder="Maximum number">
+                <button id="generateRange">Generate numbers</button>
+            </div>
+
+            <h2>Add Options</h2>
+            <div class="group">
+                <input type="text" id="optionInput" placeholder="Enter option">
+                <button id="addButton">Add option</button>
+                <button id="spinButton">Spin</button>
+            </div>
+
+            <h2 id="optionsHeader" class="options-header" style="display: none;">
+                Options
+                <button id="toggleOptionsButton" class="toggle-button">Show/Hide</button>
+            </h2>
+            <ul id="optionsList" style="display: none;"></ul>
+
+            <h2>Manage Options</h2>
+            <div class="group">
+                <button id="importButton" class="subtle-button">Import data</button>
+                <button id="exportButton" class="subtle-button">Export data</button>
+                <button id="clearOptionsButton" class="subtle-button">Clear saved</button>
+            </div>
+        </section>
+
+        <section id="wheelContainer" class="wheel-card glass-card">
+            <div id="arrowWrapper">
+                <img src="media/arrow.png" alt="Arrow" id="arrow">
+            </div>
+            <canvas id="wheel" width="800" height="800"></canvas>
+        </section>
+    </main>
+
+    <footer>
+        <a href="https://majkey25.github.io/My-website-for-fun/">
+            Made by Matej Teply (c) <span id="year"></span> All rights reserved.
         </a>
     </footer>
-    
 
     <script>
-    // Load saved options from localStorage or initialize as an empty array
-    const options = JSON.parse(localStorage.getItem('wheelOptions')) || [];
-    const canvas = document.getElementById('wheel');
-    const ctx = canvas.getContext('2d');
-    const spinButton = document.getElementById('spinButton');
-    const optionInput = document.getElementById('optionInput');
-    const addButton = document.getElementById('addButton');
-    const optionsList = document.getElementById('optionsList');
-    const optionsHeader = document.getElementById('optionsHeader');
-    const resultDiv = document.getElementById('result');
-    const clickSound = new Audio('media/click.wav');
+        const options = JSON.parse(localStorage.getItem('wheelOptions')) || [];
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinButton = document.getElementById('spinButton');
+        const optionInput = document.getElementById('optionInput');
+        const addButton = document.getElementById('addButton');
+        const optionsList = document.getElementById('optionsList');
+        const optionsHeader = document.getElementById('optionsHeader');
+        const resultDiv = document.getElementById('result');
+        const clickSound = new Audio('media/click.wav');
 
-    optionsList.style.display = 'none';
-    optionsHeader.style.display = 'none';
+        optionsList.style.display = 'none';
+        optionsHeader.style.display = 'none';
 
-function initializeWheel() {
-    const wheelToggle = document.getElementById('wheelToggle');
-
-    // Force the toggle to be unchecked
-    wheelToggle.checked = false;
-
-    // Event listener for toggle switch
-    wheelToggle.addEventListener('change', () => {
-        if (wheelToggle.checked) {
-            drawClassicWheel();
-            
-        } else {
-            drawRouletteWheel();
-        }
-    });
-}
-
-// Initial setup: Render options and initialize the wheel
-renderOptions();
-initializeWheel();
-
-
-
-    function drawClassicWheel() {
-        const numOptions = options.length;
-        if (numOptions === 0) return;
-
-        const angle = (2 * Math.PI) / numOptions;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2); // Center of rotation
-
-        const radius = 350;
-        const textRadius = 300;
-        for (let i = 0; i < numOptions; i++) {
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
-
-            ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`;
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
-
-            ctx.fillStyle = '#000';
-            ctx.font = "bold 30px 'Lato', sans-serif";
-            const text = options[i];
-            const textWidth = ctx.measureText(text).width;
-            const textHeight = 30;
-
-            ctx.fillText(text,
-                textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
-                textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2
-            );
+        function initializeWheel() {
+            const wheelToggle = document.getElementById('wheelToggle');
+            wheelToggle.checked = false;
+            wheelToggle.addEventListener('change', () => {
+                if (wheelToggle.checked) {
+                    drawClassicWheel();
+                } else {
+                    drawRouletteWheel();
+                }
+            });
         }
 
-        ctx.restore();
-    }
+        renderOptions();
+        initializeWheel();
 
+        function drawClassicWheel() {
+            const numOptions = options.length;
+            if (numOptions === 0) return;
 
-    function drawRouletteWheel() {
-    const numOptions = options.length + 1; // Přidání jednoho pole pro zelené "znovuotočení"
-    if (numOptions === 0) return;
+            const angle = (2 * Math.PI) / numOptions;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
 
-    const angle = (2 * Math.PI) / numOptions;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2); // Střed otáčení
+            const radius = 350;
+            const textRadius = 300;
+            for (let i = 0; i < numOptions; i += 1) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
+                ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
 
-    const radius = 350;
-    const textRadius = 300;
+                ctx.fillStyle = '#000';
+                ctx.font = "bold 30px 'Lato', sans-serif";
+                const text = options[i];
+                const textWidth = ctx.measureText(text).width;
+                const textHeight = 30;
 
-    for (let i = 0; i < numOptions; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
+                ctx.fillText(text,
+                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
+                    textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2);
+            }
 
-        // Nastavení barvy: červená, černá, poslední zelená
-        if (i === numOptions - 1) {
-            ctx.fillStyle = '#28a745'; // Zelená pro znovuotočení
-        } else {
-            ctx.fillStyle = i % 2 === 0 ? '#FF0000' : '#000000'; // Střídání červená a černá
+            ctx.restore();
         }
 
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.stroke();
+        function drawRouletteWheel() {
+            const numOptions = options.length + 1;
+            if (numOptions === 0) return;
 
-        // Přidání textu
-        ctx.fillStyle = '#fff'; // Bílá pro čitelnost
-        ctx.font = "bold 25px Arial";
-        const text = i === numOptions - 1 ? '' : options[i];
-        const textWidth = ctx.measureText(text).width;
+            const angle = (2 * Math.PI) / numOptions;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
 
-        ctx.fillText(
-            text,
-            textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
-            textRadius * Math.sin(i * angle + angle / 2) + 10
-        );
-    }
+            const radius = 350;
+            const textRadius = 300;
 
-    ctx.restore();
-}
+            for (let i = 0; i < numOptions; i += 1) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
 
-
-    // Handle spinning the wheel
-    spinButton.addEventListener('click', () => {
-        if (options.length <= 1) {
-            alert("You must have at least 2 options to spin the wheel.");
-            return;
-        }
-
-        // Reset rotation before each spin
-        canvas.style.transition = 'none';
-        canvas.style.transform = 'rotate(0deg)';
-
-        setTimeout(() => {
-            const min = 613;
-            const max = 2913;
-            const deg = Math.floor(Math.random() * (max - min)) + min;
-
-            canvas.style.transition = "transform 18s cubic-bezier(0.3, 0.6, 0.2, 1)";
-            canvas.style.transform = `rotate(${deg}deg)`;
-
-            let lastSegmentIndex = null;
-
-            const syncClicks = () => {
-                const currentRotation = getComputedStyle(canvas).transform;
-                const matrixValues = currentRotation.match(/matrix\((.+)\)/);
-                if (matrixValues) {
-                    const matrix = matrixValues[1].split(', ');
-                    const a = parseFloat(matrix[0]);
-                    const b = parseFloat(matrix[1]);
-                    const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
-
-                    const normalizedAngle = (currentAngle + 360) % 360;
-                    const anglePerSegment = 360 / options.length;
-                    const currentSegmentIndex = Math.floor(normalizedAngle / anglePerSegment);
-
-                    const isAtBoundary = normalizedAngle % anglePerSegment < 5 || normalizedAngle % anglePerSegment > anglePerSegment - 5;
-                    if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
-                        clickSound.currentTime = 0;
-                        clickSound.play();
-                        lastSegmentIndex = currentSegmentIndex;
-                    }
+                if (i === numOptions - 1) {
+                    ctx.fillStyle = '#28a745';
+                } else {
+                    ctx.fillStyle = i % 2 === 0 ? '#FF0000' : '#000000';
                 }
 
-                requestAnimationFrame(syncClicks);
-            };
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
 
-            requestAnimationFrame(syncClicks);
+                ctx.fillStyle = '#fff';
+                ctx.font = "bold 25px Arial";
+                const text = i === numOptions - 1 ? '' : options[i];
+                const textWidth = ctx.measureText(text).width;
+
+                ctx.fillText(
+                    text,
+                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
+                    textRadius * Math.sin(i * angle + angle / 2) + 10);
+            }
+
+            ctx.restore();
+        }
+
+        spinButton.addEventListener('click', () => {
+            if (options.length <= 1) {
+                alert('You must have at least 2 options to spin the wheel.');
+                return;
+            }
+
+            canvas.style.transition = 'none';
+            canvas.style.transform = 'rotate(0deg)';
 
             setTimeout(() => {
-                const selectedIndex = Math.floor((deg % 360) / (360 / options.length));
-                const selectedOption = options[selectedIndex];
-                resultDiv.innerText = `Vybraná možnost: ${selectedOption}`;
-            }, 18000);
-        }, 10);
-    });
+                const min = 613;
+                const max = 2913;
+                const deg = Math.floor(Math.random() * (max - min)) + min;
 
-    // Add new option
-    addButton.addEventListener('click', () => {
-        const option = optionInput.value.trim();
-        if (option) {
-            options.push(option);
-            optionInput.value = '';
-            renderOptions();
-            drawClassicWheel();
-            drawRouletteWheel();
-        }
-    });
+                canvas.style.transition = 'transform 18s cubic-bezier(0.3, 0.6, 0.2, 1)';
+                canvas.style.transform = `rotate(${deg}deg)`;
 
-    // Render options list to the menu
-    function renderOptions() {
-        optionsList.innerHTML = '';
-        options.forEach((option, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <input type="text" value="${option}" onchange="updateOption(${index}, this.value)">
-                <button class="remove-button" onclick="removeOption(${index})">&times;</button>
-            `;
-            optionsList.appendChild(li);
+                let lastSegmentIndex = null;
+
+                const syncClicks = () => {
+                    const currentRotation = getComputedStyle(canvas).transform;
+                    const matrixValues = currentRotation.match(/matrix\((.+)\)/);
+                    if (matrixValues) {
+                        const matrix = matrixValues[1].split(', ');
+                        const a = parseFloat(matrix[0]);
+                        const b = parseFloat(matrix[1]);
+                        const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
+
+                        const normalizedAngle = (currentAngle + 360) % 360;
+                        const anglePerSegment = 360 / options.length;
+                        const currentSegmentIndex =
+                            Math.floor(normalizedAngle / anglePerSegment);
+
+                        const boundary = normalizedAngle % anglePerSegment;
+                        const isAtBoundary = boundary < 5 ||
+                            boundary > anglePerSegment - 5;
+                        if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
+                            clickSound.currentTime = 0;
+                            clickSound.play();
+                            lastSegmentIndex = currentSegmentIndex;
+                        }
+                    }
+
+                    requestAnimationFrame(syncClicks);
+                };
+
+                requestAnimationFrame(syncClicks);
+
+                setTimeout(() => {
+                    const selectedIndex =
+                        Math.floor((deg % 360) / (360 / options.length));
+                    const selectedOption = options[selectedIndex];
+                    if (resultDiv) {
+                        resultDiv.innerText = `Selected option: ${selectedOption}`;
+                    }
+                }, 18000);
+            }, 10);
         });
 
-        // Save options to localStorage after rendering
-        saveOptions();
+        addButton.addEventListener('click', () => {
+            const option = optionInput.value.trim();
+            if (option) {
+                options.push(option);
+                optionInput.value = '';
+                renderOptions();
+                drawClassicWheel();
+                drawRouletteWheel();
+            }
+        });
 
-        if (options.length > 0) {
-            optionsList.style.display = 'block';
-            optionsHeader.style.display = 'block';
-        } else {
-            optionsList.style.display = 'none';
-            optionsHeader.style.display = 'none';
-        }
-    }
-
-    // Save options to localStorage
-    function saveOptions() {
-        localStorage.setItem('wheelOptions', JSON.stringify(options));
-    }
-
-    // Update an existing option
-    function updateOption(index, value) {
-        options[index] = value;
-        renderOptions(); // Save options after update
-        drawClassicWheel();
-        drawRouletteWheel();
-    }
-
-    // Remove an option
-    function removeOption(index) {
-        options.splice(index, 1);
-        renderOptions(); // Save options after removal
-        drawClassicWheel();
-        drawRouletteWheel();
-    }
-
-    // Import options
-    document.getElementById('importButton').addEventListener('click', () => {
-        const importedOptions = prompt("Paste your options (comma-separated):");
-        if (importedOptions) {
-            options.length = 0;  // Clear existing options
-            importedOptions.split(',').forEach(option => {
-                options.push(option.trim());
+        function renderOptions() {
+            optionsList.innerHTML = '';
+            options.forEach((option, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="text" value="${option}"
+                        onchange="updateOption(${index}, this.value)">
+                    <button class="remove-button" onclick="removeOption(${index})">
+                        &times;
+                    </button>`;
+                optionsList.appendChild(li);
             });
+
+            saveOptions();
+
+            if (options.length > 0) {
+                optionsList.style.display = 'block';
+                optionsHeader.style.display = 'flex';
+            } else {
+                optionsList.style.display = 'none';
+                optionsHeader.style.display = 'none';
+            }
+        }
+
+        function saveOptions() {
+            localStorage.setItem('wheelOptions', JSON.stringify(options));
+        }
+
+        function updateOption(index, value) {
+            options[index] = value;
             renderOptions();
             drawClassicWheel();
             drawRouletteWheel();
         }
-    });
 
-    // Export options
-    document.getElementById('exportButton').addEventListener('click', () => {
-        const exportedOptions = options.join(', ');
-        alert(`${exportedOptions}`);
-    });
+        function removeOption(index) {
+            options.splice(index, 1);
+            renderOptions();
+            drawClassicWheel();
+            drawRouletteWheel();
+        }
 
-    // Clear saved options
-    document.getElementById('clearOptionsButton').addEventListener('click', () => {
-        localStorage.removeItem('wheelOptions');
-        options.length = 0;
+        document.getElementById('importButton').addEventListener('click', () => {
+            const importedOptions = prompt('Paste your options (comma-separated):');
+            if (importedOptions) {
+                options.length = 0;
+                importedOptions.split(',').forEach(option => {
+                    options.push(option.trim());
+                });
+                renderOptions();
+                drawClassicWheel();
+                drawRouletteWheel();
+            }
+        });
+
+        document.getElementById('exportButton').addEventListener('click', () => {
+            const exportedOptions = options.join(', ');
+            alert(`${exportedOptions}`);
+        });
+
+        document.getElementById('clearOptionsButton').addEventListener('click', () => {
+            localStorage.removeItem('wheelOptions');
+            options.length = 0;
+            renderOptions();
+            drawClassicWheel();
+            drawRouletteWheel();
+        });
+
         renderOptions();
         drawClassicWheel();
         drawRouletteWheel();
-    });
 
-    // Initialize the page by rendering options and drawing the wheel
-    renderOptions();
-    drawClassicWheel();
-    drawRouletteWheel();
+        const randomNumberModal = document.getElementById('randomNumberModal');
+        const openRandomNumberModal = document.getElementById('openRandomNumberModal');
+        const closeRNG = document.getElementsByClassName('close')[0];
+        const generateRandomNumberButton = document.getElementById('generateRandomNumber');
+        const randomNumberResult = document.getElementById('randomNumberResult');
 
-    // Random Number Generator Logic
-    const randomNumberModal = document.getElementById('randomNumberModal');
-    const openRandomNumberModal = document.getElementById('openRandomNumberModal');
-    const closeRNG = document.getElementsByClassName('close')[0];
-    const generateRandomNumberButton = document.getElementById('generateRandomNumber');
-    const randomNumberResult = document.getElementById('randomNumberResult');
+        openRandomNumberModal.addEventListener('click', () => {
+            randomNumberModal.style.display = 'flex';
+        });
 
-    // Open the modal when the button is clicked
-    openRandomNumberModal.addEventListener('click', () => {
-        randomNumberModal.style.display = 'block';
-    });
-
-    // Close the modal when the close button is clicked
-    closeRNG.addEventListener('click', () => {
-        randomNumberModal.style.display = 'none';
-    });
-
-    // Close the modal if clicking outside the modal content
-    window.addEventListener('click', (event) => {
-        if (event.target === randomNumberModal) {
+        closeRNG.addEventListener('click', () => {
             randomNumberModal.style.display = 'none';
-        }
-    });
+        });
 
-    // Generate a random number within the specified range
-    generateRandomNumberButton.addEventListener('click', () => {
-        const min = parseInt(document.getElementById('minNumber').value);
-        const max = parseInt(document.getElementById('maxNumberRNG').value);
-        if (min < max) {
-            const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-            randomNumberResult.innerText = `Generated Number: ${randomNumber}`;
-        } else {
-            randomNumberResult.innerText = "Invalid range. Make sure min < max.";
-        }
-    });
+        window.addEventListener('click', (event) => {
+            if (event.target === randomNumberModal) {
+                randomNumberModal.style.display = 'none';
+            }
+        });
 
-    // Show/Hide options list logic
-    const toggleOptionsButton = document.getElementById('toggleOptionsButton');
-    let optionsVisible = false;
+        generateRandomNumberButton.addEventListener('click', () => {
+            const min = parseInt(document.getElementById('minNumber').value);
+            const max = parseInt(document.getElementById('maxNumberRNG').value);
+            if (min < max) {
+                const randomNumber = Math.floor(Math.random() *
+                    (max - min + 1)) + min;
+                randomNumberResult.innerText = `Generated Number: ${randomNumber}`;
+            } else {
+                randomNumberResult.innerText = 'Invalid range. Make sure min < max.';
+            }
+        });
 
-    toggleOptionsButton.innerText = 'Show/Hide';
+        const toggleOptionsButton = document.getElementById('toggleOptionsButton');
+        let optionsVisible = false;
 
-    toggleOptionsButton.addEventListener('click', () => {
-        if (optionsVisible) {
-            optionsList.style.display = 'none'; // Hide options list  
-        } else {
-            optionsList.style.display = 'block'; // Show options list
-        }
-        optionsVisible = !optionsVisible; // Toggle the visibility state
-    });
+        toggleOptionsButton.innerText = 'Show/Hide';
 
-    // Set year dynamically
-    document.getElementById('year').textContent = new Date().getFullYear();
-    document.getElementById('generateRange').addEventListener('click', () => {
-    const maxNumber = parseInt(document.getElementById('maxNumber').value);
-    if (maxNumber && maxNumber > 0) {
-        options.length = 0; // Clear previous options
-        for (let i = 1; i <= maxNumber; i++) {
-            options.push(i.toString());
-        }
-        renderOptions();
-        drawClassicWheel();
-        drawRouletteWheel();
-    } else {
-        alert("Please enter a valid number greater than 0");
-    }
-});
+        toggleOptionsButton.addEventListener('click', () => {
+            if (optionsVisible) {
+                optionsList.style.display = 'none';
+            } else {
+                optionsList.style.display = 'block';
+            }
+            optionsVisible = !optionsVisible;
+        });
 
-    </script>    
+        document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById('generateRange').addEventListener('click', () => {
+            const maxNumber = parseInt(document.getElementById('maxNumber').value);
+            if (maxNumber && maxNumber > 0) {
+                options.length = 0;
+                for (let i = 1; i <= maxNumber; i += 1) {
+                    options.push(i.toString());
+                }
+                renderOptions();
+                drawClassicWheel();
+                drawRouletteWheel();
+            } else {
+                alert('Please enter a valid number greater than 0');
+            }
+        });
+    </script>
 </body>
 </html>
