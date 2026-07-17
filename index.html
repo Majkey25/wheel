@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Spin The Wheel</title>
+    <meta name="theme-color" content="#f5f2eb">
+    <title>Spin the Wheel</title>
     <link rel="icon" sizes="192x192" href="media/logo.png" type="image/png">
     <link rel="icon" sizes="512x512" href="media/logo2.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,820 +13,1016 @@
           rel="stylesheet">
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.06);
-            --glass-stroke: rgba(255, 255, 255, 0.12);
-            --text: #e6ecff;
-            --muted: #b2b8cb;
-            --accent: #7cf2d4;
-            --accent-strong: #7c9dff;
-            --shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+            --background: #f5f2eb;
+            --surface: #fffdf8;
+            --text: #181818;
+            --muted: #686761;
+            --line: #b8b5ad;
+            --strong-line: #272727;
+            --danger: #a1352d;
+            --focus: #235fba;
         }
 
         * {
             box-sizing: border-box;
         }
 
+        html {
+            color-scheme: light;
+        }
+
         body {
-            font-family: "Space Grotesk", "Segoe UI", sans-serif;
-            background: radial-gradient(circle at 20% 20%, #1a2746 0%, #0a0d18 40%,
-                                        #05060c 100%);
-            color: var(--text);
-            margin: 0;
+            min-width: 320px;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-            padding: 32px;
-            position: relative;
-        }
-
-        body::before,
-        body::after {
-            content: "";
-            position: absolute;
-            width: 640px;
-            height: 640px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.28;
-            pointer-events: none;
-            z-index: 0;
-            animation: drift 18s ease-in-out infinite alternate;
-        }
-
-        body::before {
-            background: #4bc0c8;
-            top: -120px;
-            left: -120px;
-        }
-
-        body::after {
-            background: #6f7bf7;
-            bottom: -180px;
-            right: -120px;
-            animation-delay: 4s;
-        }
-
-        .layout {
-            width: 100%;
-            max-width: 1280px;
-            display: flex;
-            gap: 28px;
-            align-items: flex-start;
-            justify-content: center;
-            z-index: 1;
-        }
-
-        .glass-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-stroke);
-            border-radius: 20px;
-            backdrop-filter: blur(14px);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%,
-                                        rgba(255, 255, 255, 0) 40%);
-            pointer-events: none;
-        }
-
-        .menu {
-            width: 340px;
-            padding: 22px 22px 18px;
-            max-height: calc(100vh - 80px);
-            overflow-y: auto;
-            animation: floaty 10s ease-in-out infinite;
-        }
-
-        h1 {
-            margin: 8px 0 18px;
-            font-size: 28px;
-            letter-spacing: 0.4px;
-            text-align: center;
-        }
-
-        h2 {
-            margin: 18px 0 10px;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--muted);
-            letter-spacing: 0.2px;
-        }
-
-        .group {
-            display: grid;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .options-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        label {
-            font-size: 14px;
-            color: var(--muted);
-            margin-left: 2px;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.04);
+            margin: 0;
+            background: var(--background);
             color: var(--text);
-            outline: none;
-            transition: border 0.2s ease, box-shadow 0.2s ease;
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
         }
 
-        input[type="text"]:focus,
-        input[type="number"]:focus {
-            border-color: rgba(124, 242, 212, 0.8);
-            box-shadow: 0 0 0 4px rgba(124, 242, 212, 0.14);
+        button,
+        input {
+            font: inherit;
         }
 
         button {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: none;
+            min-height: 42px;
+            border: 1px solid var(--strong-line);
+            border-radius: 7px;
+            background: transparent;
+            color: var(--text);
             cursor: pointer;
             font-weight: 600;
-            letter-spacing: 0.2px;
-            color: #04101e;
-            background: linear-gradient(120deg, var(--accent-strong), var(--accent));
-            box-shadow: 0 12px 22px rgba(124, 242, 212, 0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-            position: relative;
+        }
+
+        button:hover:not(:disabled) {
+            background: #e9e5dc;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--focus);
+            outline-offset: 2px;
+        }
+
+        input {
+            min-width: 0;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: var(--surface);
+            color: var(--text);
+            padding: 9px 12px;
+        }
+
+        input::placeholder {
+            color: #77756f;
+        }
+
+        input:focus {
+            border-color: var(--strong-line);
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: minmax(340px, 390px) minmax(0, 1fr);
+            grid-template-rows: auto 1fr auto;
+            grid-template-areas:
+                "header stage"
+                "editor stage"
+                "action stage";
+            width: min(100%, 1500px);
+            min-height: calc(100vh - 58px);
+            margin: 0 auto;
+        }
+
+        .app-header {
+            grid-area: header;
+            padding: 28px 30px 10px;
+            border-right: 1px solid var(--line);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2.15rem, 3.3vw, 2.75rem);
+            line-height: 1.05;
+            letter-spacing: -0.055em;
+        }
+
+        h2,
+        legend {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .editor {
+            grid-area: editor;
+            align-self: stretch;
+            padding: 14px 30px 24px;
+            border-right: 1px solid var(--line);
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .count {
+            color: var(--muted);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .add-form {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .add-form button {
+            min-width: 72px;
+        }
+
+        .options-list {
+            display: grid;
+            max-height: min(34vh, 360px);
+            gap: 7px;
+            margin: 0;
+            padding: 0 4px 0 0;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            list-style: none;
+        }
+
+        .option-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 42px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: var(--surface);
             overflow: hidden;
         }
 
-        button::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.12),
-                                        rgba(255, 255, 255, 0));
-            transform: translateX(-80%);
-            transition: transform 0.4s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 26px rgba(124, 242, 212, 0.32);
-            filter: brightness(1.03);
-        }
-
-        button:hover::after {
-            transform: translateX(20%);
-        }
-
-        .subtle-button {
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text);
-            box-shadow: none;
-        }
-
-        .subtle-button:hover {
-            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.3);
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            gap: 8px;
-        }
-
-        li {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        li input {
-            flex: 1;
+        .option-row input {
+            border: 0;
+            border-radius: 0;
+            background: transparent;
         }
 
         .remove-button {
-            width: auto;
-            padding: 6px 10px;
-            border-radius: 10px;
-            background: rgba(255, 80, 80, 0.18);
-            color: #ff9f9f;
-            box-shadow: none;
+            min-height: 42px;
+            border: 0;
+            border-left: 1px solid var(--line);
+            border-radius: 0;
+            color: var(--danger);
+            font-size: 1.35rem;
+            line-height: 1;
         }
 
-        .remove-button:hover {
-            filter: brightness(1.1);
+        .tool-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
         }
 
-        .toggle-row {
-            display: flex;
+        .range-form {
+            display: grid;
+            grid-template-columns: auto minmax(64px, 1fr) auto;
             align-items: center;
-            gap: 12px;
-            justify-content: space-between;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-top: 12px;
         }
 
-        .switch {
-            position: relative;
-            display: inline-flex;
-            width: 70px;
-            height: 36px;
+        .range-form label {
+            white-space: nowrap;
         }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .random-button {
+            width: 100%;
+            margin-top: 10px;
         }
 
-        .slider {
-            position: absolute;
-            inset: 0;
-            cursor: pointer;
-            background: linear-gradient(120deg, #ff6b9c, #ff8566);
-            transition: 0.3s ease;
-            border-radius: 30px;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-        }
-
-        .slider::before {
-            content: "";
-            position: absolute;
-            height: 26px;
-            width: 26px;
-            left: 5px;
-            bottom: 5px;
-            background-color: #0b0f1c;
-            border-radius: 50%;
-            transition: 0.25s ease;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
-        }
-
-        input:checked + .slider {
-            background: linear-gradient(120deg, #7cf2d4, #7c9dff);
-        }
-
-        input:checked + .slider::before {
-            transform: translateX(32px);
-        }
-
-        .toggle-button {
-            width: auto;
-            background: none;
-            color: var(--text);
-            padding: 4px 10px;
-            box-shadow: none;
-        }
-
-        .toggle-button:hover {
-            color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        #wheelContainer {
-            flex: 1;
+        .style-fieldset {
             min-width: 0;
+            margin: 24px 0 0;
+            padding: 20px 0 0;
+            border: 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .segmented {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            margin-top: 12px;
+        }
+
+        .segmented label {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .segmented input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
+        .segmented span {
+            display: grid;
+            min-height: 42px;
+            place-items: center;
+            border: 1px solid var(--strong-line);
+            font-weight: 600;
+        }
+
+        .segmented label:first-child span {
+            border-radius: 7px 0 0 7px;
+        }
+
+        .segmented label:last-child span {
+            border-left: 0;
+            border-radius: 0 7px 7px 0;
+        }
+
+        .segmented input:checked + span {
+            background: var(--text);
+            color: var(--surface);
+        }
+
+        .segmented input:focus-visible + span {
+            outline: 3px solid var(--focus);
+            outline-offset: 2px;
+        }
+
+        .utility-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        .utility-row button {
+            min-width: 0;
+        }
+
+        .spin-action {
+            grid-area: action;
+            padding: 0 30px 28px;
+            border-right: 1px solid var(--line);
+        }
+
+        .primary-button {
+            width: 100%;
+            min-height: 54px;
+            background: var(--text);
+            color: var(--surface);
+            font-size: 1.05rem;
+        }
+
+        .primary-button:hover:not(:disabled) {
+            background: #343434;
+        }
+
+        .wheel-stage {
+            grid-area: stage;
             display: flex;
+            min-width: 0;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 22px;
-            animation: floaty 12s ease-in-out infinite alternate;
+            padding: 24px 34px 28px;
         }
 
-        .wheel-card {
-            width: 100%;
-            padding: 26px 26px 16px;
+        .wheel-wrap {
+            position: relative;
+            width: min(100%, 760px, calc(100vh - 170px));
+            aspect-ratio: 1;
         }
 
-        #arrowWrapper {
+        .pointer {
             position: absolute;
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
             z-index: 2;
-            pointer-events: none;
-        }
-
-        #arrowWrapper img {
-            width: 86px;
-            filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.4));
+            top: -2px;
+            left: 50%;
+            width: 38px;
+            height: 38px;
+            background: var(--text);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform: translateX(-50%);
         }
 
         canvas {
-            width: min(70vw, 720px);
-            height: auto;
-            border-radius: 50%;
             display: block;
-            margin: 24px auto 10px;
-            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.06) 0%,
-                                        rgba(255, 255, 255, 0) 60%);
-            border: 12px solid transparent;
-            background-origin: border-box;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4),
-                        inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-                        0 0 60px rgba(124, 157, 255, 0.2);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform: rotate(0deg);
+            will-change: transform;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 10;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(8px);
-            align-items: center;
-            justify-content: center;
+        .result {
+            min-height: 2.5rem;
+            margin: 18px 0 0;
+            font-size: clamp(1.35rem, 2.5vw, 2rem);
+            font-weight: 600;
+            line-height: 1.2;
+            text-align: center;
         }
 
-        .modal-content {
-            background: var(--glass);
-            border: 1px solid var(--glass-stroke);
-            border-radius: 18px;
-            padding: 22px;
-            width: 320px;
-            color: var(--text);
-            box-shadow: var(--shadow);
-            position: relative;
-        }
-
-        .close {
-            position: absolute;
-            right: 16px;
-            top: 10px;
-            font-size: 26px;
-            color: var(--muted);
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #ff9f9f;
+        .result[data-tone="error"] {
+            color: var(--danger);
         }
 
         footer {
-            width: 100%;
-            max-width: 1280px;
-            margin-top: 22px;
-            color: var(--muted);
-            text-align: center;
-            font-size: 13px;
-            letter-spacing: 0.2px;
-            display: flex;
-            justify-content: center;
-            padding: 8px 0 4px;
-            z-index: 1;
+            width: min(100%, 1500px);
+            margin: 0 auto;
+            padding: 18px 30px;
+            border-top: 1px solid var(--line);
+            font-size: 0.9rem;
         }
 
         footer a {
             color: inherit;
             text-decoration: none;
-            transition: color 0.2s ease;
         }
 
         footer a:hover {
-            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
 
-        @keyframes floaty {
-            0% {
-                transform: translateY(0px);
+        dialog {
+            width: min(92vw, 420px);
+            border: 1px solid var(--strong-line);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--text);
+            padding: 0;
+        }
+
+        dialog::backdrop {
+            background: rgb(24 24 24 / 52%);
+        }
+
+        .dialog-content {
+            padding: 24px;
+        }
+
+        .dialog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .close-button {
+            width: 42px;
+            min-height: 42px;
+            padding: 0;
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .dialog-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .dialog-fields label {
+            display: grid;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .dialog-submit {
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .dialog-result {
+            min-height: 1.5rem;
+            margin: 16px 0 0;
+            font-weight: 600;
+        }
+
+        @media (max-width: 800px) {
+            .app {
+                display: grid;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+                grid-template-areas:
+                    "header"
+                    "stage"
+                    "action"
+                    "editor";
+                min-height: 0;
             }
-            50% {
-                transform: translateY(-6px);
+
+            .app-header {
+                padding: 24px 20px 12px;
+                border-right: 0;
             }
-            100% {
-                transform: translateY(0px);
+
+            h1 {
+                font-size: clamp(2.2rem, 11vw, 3rem);
+            }
+
+            .wheel-stage {
+                padding: 12px 20px 8px;
+            }
+
+            .wheel-wrap {
+                width: min(100%, 520px);
+            }
+
+            .result {
+                margin-top: 14px;
+            }
+
+            .spin-action {
+                padding: 10px 20px 28px;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .editor {
+                padding: 26px 20px 30px;
+                border-right: 0;
+            }
+
+            .options-list {
+                max-height: none;
+                padding-right: 0;
+                overflow-y: visible;
+                scrollbar-gutter: auto;
+            }
+
+            footer {
+                padding: 18px 20px;
             }
         }
 
-        @keyframes drift {
-            from {
-                transform: translateY(0px) translateX(0px);
+        @media (max-width: 430px) {
+            .range-form {
+                grid-template-columns: auto minmax(58px, 1fr);
             }
-            to {
-                transform: translateY(-40px) translateX(20px);
+
+            .range-form button {
+                grid-column: 1 / -1;
             }
         }
 
-        @media (max-width: 1100px) {
-            .layout {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .menu {
-                width: 100%;
-                max-width: 620px;
-            }
-
-            #wheelContainer {
-                width: 100%;
-            }
-
-            canvas {
-                width: min(90vw, 640px);
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
             }
         }
     </style>
 </head>
 <body>
-    <main class="layout">
-        <section class="menu glass-card">
-            <div class="toggle-row">
-                <label>Classic Wheel</label>
-                <label class="switch">
-                    <input type="checkbox" id="wheelToggle">
-                    <span class="slider"></span>
-                </label>
+    <main class="app">
+        <header class="app-header">
+            <h1>Spin the wheel</h1>
+        </header>
+
+        <section class="editor" id="editor" aria-labelledby="choicesHeading">
+            <div class="section-heading">
+                <h2 id="choicesHeading">Your choices</h2>
+                <span class="count" id="choiceCount">0 choices</span>
             </div>
 
-            <h2>Number Generator</h2>
-            <div class="group">
-                <button id="openRandomNumberModal">Open Generator</button>
-            </div>
-            <div id="randomNumberModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Generate Random Number</h2>
-                    <label for="minNumber">Min:</label>
-                    <input type="number" id="minNumber" value="1">
-                    <label for="maxNumberRNG">Max:</label>
-                    <input type="number" id="maxNumberRNG" value="15">
-                    <button id="generateRandomNumber">Generate</button>
-                    <div id="randomNumberResult"></div>
+            <form class="add-form" id="addForm">
+                <input type="text" id="optionInput" maxlength="60"
+                       placeholder="Add a choice" aria-label="Add a choice" required>
+                <button type="submit">Add</button>
+            </form>
+
+            <ul class="options-list" id="optionsList"></ul>
+
+            <section class="tool-section" aria-labelledby="numbersHeading">
+                <h2 id="numbersHeading">Quick numbers</h2>
+                <form class="range-form" id="rangeForm">
+                    <label for="rangeMax">Create 1 to</label>
+                    <input type="number" id="rangeMax" value="10" min="2" max="100"
+                           inputmode="numeric" required>
+                    <button type="submit">Generate</button>
+                </form>
+                <button type="button" class="random-button" id="openRandomDialog">
+                    Random number
+                </button>
+            </section>
+
+            <fieldset class="style-fieldset">
+                <legend>Wheel style</legend>
+                <div class="segmented">
+                    <label>
+                        <input type="radio" name="wheelStyle" value="color" checked>
+                        <span>Color</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="wheelStyle" value="roulette">
+                        <span>Roulette</span>
+                    </label>
                 </div>
-            </div>
+            </fieldset>
 
-            <h1>Spin the Wheel</h1>
-
-            <h2>Number Range</h2>
-            <div class="group">
-                <input type="number" id="maxNumber" placeholder="Maximum number">
-                <button id="generateRange">Generate numbers</button>
-            </div>
-
-            <h2>Add Options</h2>
-            <div class="group">
-                <input type="text" id="optionInput" placeholder="Enter option">
-                <button id="addButton">Add option</button>
-                <button id="spinButton">Spin</button>
-            </div>
-
-            <h2 id="optionsHeader" class="options-header" style="display: none;">
-                Options
-                <button id="toggleOptionsButton" class="toggle-button">Show/Hide</button>
-            </h2>
-            <ul id="optionsList" style="display: none;"></ul>
-
-            <h2>Manage Options</h2>
-            <div class="group">
-                <button id="importButton" class="subtle-button">Import data</button>
-                <button id="exportButton" class="subtle-button">Export data</button>
-                <button id="clearOptionsButton" class="subtle-button">Clear saved</button>
+            <div class="utility-row" aria-label="Choice utilities">
+                <button type="button" id="importButton">Import</button>
+                <button type="button" id="exportButton">Export</button>
+                <button type="button" id="clearButton">Clear</button>
             </div>
         </section>
 
-        <section id="wheelContainer" class="wheel-card glass-card">
-            <div id="arrowWrapper">
-                <img src="media/arrow.png" alt="Arrow" id="arrow">
+        <div class="spin-action">
+            <button type="button" class="primary-button" id="spinButton">
+                Spin the wheel
+            </button>
+        </div>
+
+        <section class="wheel-stage" aria-label="Decision wheel">
+            <div class="wheel-wrap">
+                <div class="pointer" aria-hidden="true"></div>
+                <canvas id="wheel" width="800" height="800" role="img"
+                        aria-label="Empty decision wheel">
+                    Your browser does not support the decision wheel.
+                </canvas>
             </div>
-            <canvas id="wheel" width="800" height="800"></canvas>
+            <p class="result" id="result" role="status" aria-live="polite">
+                Add 2 choices to begin
+            </p>
         </section>
     </main>
 
     <footer>
         <a href="https://majkey25.github.io/My-website-for-fun/">
-            Made by Matej Teply (c) <span id="year"></span> All rights reserved.
+            Made by Matej Teply
         </a>
     </footer>
 
+    <dialog id="randomDialog" aria-labelledby="randomDialogTitle">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <h2 id="randomDialogTitle">Random number</h2>
+                <button type="button" class="close-button" id="closeRandomDialog"
+                        aria-label="Close random number generator">&times;</button>
+            </div>
+            <form id="randomForm">
+                <div class="dialog-fields">
+                    <label for="minNumber">
+                        Minimum
+                        <input type="number" id="minNumber" value="1"
+                               min="-1000000" max="1000000" required>
+                    </label>
+                    <label for="maxNumber">
+                        Maximum
+                        <input type="number" id="maxNumber" value="15"
+                               min="-1000000" max="1000000" required>
+                    </label>
+                </div>
+                <button type="submit" class="primary-button dialog-submit">
+                    Generate
+                </button>
+                <output class="dialog-result" id="randomResult" aria-live="polite">
+                </output>
+            </form>
+        </div>
+    </dialog>
+
     <script>
-        const options = JSON.parse(localStorage.getItem('wheelOptions')) || [];
+        const STORAGE_KEY = 'wheelOptions';
+        const MAX_OPTIONS = 100;
+        const MAX_OPTION_LENGTH = 60;
+        const SPIN_DURATION_MS = 4200;
+        const POINTER_ANGLE_RADIANS = -Math.PI / 2;
+        const COLOR_SEGMENTS = [
+            { background: '#c8493d', text: '#fffdf8' },
+            { background: '#d6a12f', text: '#181818' },
+            { background: '#1d7776', text: '#fffdf8' },
+            { background: '#3f7092', text: '#fffdf8' },
+            { background: '#3f4f61', text: '#fffdf8' },
+            { background: '#76566d', text: '#fffdf8' }
+        ];
+        const ROULETTE_SEGMENTS = [
+            { background: '#a82e2e', text: '#fffdf8' },
+            { background: '#1c1c1c', text: '#fffdf8' }
+        ];
+
         const canvas = document.getElementById('wheel');
-        const ctx = canvas.getContext('2d');
-        const spinButton = document.getElementById('spinButton');
-        const optionInput = document.getElementById('optionInput');
-        const addButton = document.getElementById('addButton');
+        const context = canvas.getContext('2d');
+        const editor = document.getElementById('editor');
         const optionsList = document.getElementById('optionsList');
-        const optionsHeader = document.getElementById('optionsHeader');
-        const resultDiv = document.getElementById('result');
-        const clickSound = new Audio('media/click.wav');
+        const choiceCount = document.getElementById('choiceCount');
+        const addForm = document.getElementById('addForm');
+        const optionInput = document.getElementById('optionInput');
+        const rangeForm = document.getElementById('rangeForm');
+        const rangeMax = document.getElementById('rangeMax');
+        const spinButton = document.getElementById('spinButton');
+        const result = document.getElementById('result');
+        const randomDialog = document.getElementById('randomDialog');
+        const randomForm = document.getElementById('randomForm');
+        const randomResult = document.getElementById('randomResult');
 
-        optionsList.style.display = 'none';
-        optionsHeader.style.display = 'none';
+        let options = loadOptions();
+        let wheelStyle = 'color';
+        let rotation = 0;
+        let spinning = false;
+        let spinTimer;
 
-        function initializeWheel() {
-            const wheelToggle = document.getElementById('wheelToggle');
-            wheelToggle.checked = false;
-            wheelToggle.addEventListener('change', () => {
-                if (wheelToggle.checked) {
-                    drawClassicWheel();
-                } else {
-                    drawRouletteWheel();
-                }
-            });
+        function cleanOption(value) {
+            return value.trim().slice(0, MAX_OPTION_LENGTH);
         }
 
-        renderOptions();
-        initializeWheel();
-
-        function drawClassicWheel() {
-            const numOptions = options.length;
-            if (numOptions === 0) return;
-
-            const angle = (2 * Math.PI) / numOptions;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-
-            const radius = 350;
-            const textRadius = 300;
-            for (let i = 0; i < numOptions; i += 1) {
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
-                ctx.fillStyle = `hsl(${i * (360 / numOptions)}, 70%, 60%)`;
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.stroke();
-
-                ctx.fillStyle = '#000';
-                ctx.font = "bold 30px 'Lato', sans-serif";
-                const text = options[i];
-                const textWidth = ctx.measureText(text).width;
-                const textHeight = 30;
-
-                ctx.fillText(text,
-                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
-                    textRadius * Math.sin(i * angle + angle / 2) + textHeight / 2);
-            }
-
-            ctx.restore();
-        }
-
-        function drawRouletteWheel() {
-            const numOptions = options.length + 1;
-            if (numOptions === 0) return;
-
-            const angle = (2 * Math.PI) / numOptions;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-
-            const radius = 350;
-            const textRadius = 300;
-
-            for (let i = 0; i < numOptions; i += 1) {
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
-
-                if (i === numOptions - 1) {
-                    ctx.fillStyle = '#28a745';
-                } else {
-                    ctx.fillStyle = i % 2 === 0 ? '#FF0000' : '#000000';
+        function loadOptions() {
+            try {
+                const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                if (!Array.isArray(stored)) {
+                    return [];
                 }
 
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.stroke();
-
-                ctx.fillStyle = '#fff';
-                ctx.font = "bold 25px Arial";
-                const text = i === numOptions - 1 ? '' : options[i];
-                const textWidth = ctx.measureText(text).width;
-
-                ctx.fillText(
-                    text,
-                    textRadius * Math.cos(i * angle + angle / 2) - textWidth / 2,
-                    textRadius * Math.sin(i * angle + angle / 2) + 10);
+                return stored
+                    .filter(item => typeof item === 'string')
+                    .map(cleanOption)
+                    .filter(Boolean)
+                    .slice(0, MAX_OPTIONS);
+            } catch {
+                return [];
             }
-
-            ctx.restore();
         }
 
-        spinButton.addEventListener('click', () => {
-            if (options.length <= 1) {
-                alert('You must have at least 2 options to spin the wheel.');
-                return;
+        function readyMessage() {
+            if (options.length === 0) {
+                return 'Add 2 choices to begin';
             }
-
-            canvas.style.transition = 'none';
-            canvas.style.transform = 'rotate(0deg)';
-
-            setTimeout(() => {
-                const min = 613;
-                const max = 2913;
-                const deg = Math.floor(Math.random() * (max - min)) + min;
-
-                canvas.style.transition = 'transform 18s cubic-bezier(0.3, 0.6, 0.2, 1)';
-                canvas.style.transform = `rotate(${deg}deg)`;
-
-                let lastSegmentIndex = null;
-
-                const syncClicks = () => {
-                    const currentRotation = getComputedStyle(canvas).transform;
-                    const matrixValues = currentRotation.match(/matrix\((.+)\)/);
-                    if (matrixValues) {
-                        const matrix = matrixValues[1].split(', ');
-                        const a = parseFloat(matrix[0]);
-                        const b = parseFloat(matrix[1]);
-                        const currentAngle = Math.atan2(b, a) * (180 / Math.PI);
-
-                        const normalizedAngle = (currentAngle + 360) % 360;
-                        const anglePerSegment = 360 / options.length;
-                        const currentSegmentIndex =
-                            Math.floor(normalizedAngle / anglePerSegment);
-
-                        const boundary = normalizedAngle % anglePerSegment;
-                        const isAtBoundary = boundary < 5 ||
-                            boundary > anglePerSegment - 5;
-                        if (isAtBoundary && lastSegmentIndex !== currentSegmentIndex) {
-                            clickSound.currentTime = 0;
-                            clickSound.play();
-                            lastSegmentIndex = currentSegmentIndex;
-                        }
-                    }
-
-                    requestAnimationFrame(syncClicks);
-                };
-
-                requestAnimationFrame(syncClicks);
-
-                setTimeout(() => {
-                    const selectedIndex =
-                        Math.floor((deg % 360) / (360 / options.length));
-                    const selectedOption = options[selectedIndex];
-                    if (resultDiv) {
-                        resultDiv.innerText = `Selected option: ${selectedOption}`;
-                    }
-                }, 18000);
-            }, 10);
-        });
-
-        addButton.addEventListener('click', () => {
-            const option = optionInput.value.trim();
-            if (option) {
-                options.push(option);
-                optionInput.value = '';
-                renderOptions();
-                drawClassicWheel();
-                drawRouletteWheel();
+            if (options.length === 1) {
+                return 'Add 1 more choice to begin';
             }
-        });
+            return 'Ready when you are';
+        }
 
-        function renderOptions() {
-            optionsList.innerHTML = '';
-            options.forEach((option, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <input type="text" value="${option}"
-                        onchange="updateOption(${index}, this.value)">
-                    <button class="remove-button" onclick="removeOption(${index})">
-                        &times;
-                    </button>`;
-                optionsList.appendChild(li);
-            });
-
-            saveOptions();
-
-            if (options.length > 0) {
-                optionsList.style.display = 'block';
-                optionsHeader.style.display = 'flex';
-            } else {
-                optionsList.style.display = 'none';
-                optionsHeader.style.display = 'none';
-            }
+        function setStatus(message, isError = false) {
+            result.textContent = message;
+            result.dataset.tone = isError ? 'error' : '';
         }
 
         function saveOptions() {
-            localStorage.setItem('wheelOptions', JSON.stringify(options));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(options));
+                return true;
+            } catch {
+                setStatus('Choices could not be saved in this browser.', true);
+                return false;
+            }
         }
 
-        function updateOption(index, value) {
-            options[index] = value;
+        function commitOptions(nextOptions, message) {
+            options = nextOptions;
+            const saved = saveOptions();
             renderOptions();
-            drawClassicWheel();
-            drawRouletteWheel();
+            drawWheel();
+            if (saved) {
+                setStatus(message || readyMessage());
+            }
         }
 
-        function removeOption(index) {
-            options.splice(index, 1);
-            renderOptions();
-            drawClassicWheel();
-            drawRouletteWheel();
+        function renderOptions() {
+            const fragment = document.createDocumentFragment();
+
+            options.forEach((option, index) => {
+                const item = document.createElement('li');
+                const input = document.createElement('input');
+                const removeButton = document.createElement('button');
+
+                item.className = 'option-row';
+                input.type = 'text';
+                input.value = option;
+                input.maxLength = MAX_OPTION_LENGTH;
+                input.setAttribute('aria-label', 'Choice ' + (index + 1));
+                input.addEventListener('change', () => {
+                    const updated = cleanOption(input.value);
+                    if (!updated) {
+                        input.value = options[index];
+                        setStatus('A choice cannot be empty.', true);
+                        return;
+                    }
+
+                    const nextOptions = [...options];
+                    nextOptions[index] = updated;
+                    options = nextOptions;
+                    input.value = updated;
+                    removeButton.setAttribute('aria-label', 'Remove ' + updated);
+                    const saved = saveOptions();
+                    drawWheel();
+                    if (saved) {
+                        setStatus(readyMessage());
+                    }
+                });
+
+                removeButton.type = 'button';
+                removeButton.className = 'remove-button';
+                removeButton.setAttribute('aria-label', 'Remove ' + option);
+                removeButton.textContent = '×';
+                removeButton.addEventListener('click', () => {
+                    commitOptions(options.filter((_, optionIndex) => optionIndex !== index));
+                });
+
+                item.append(input, removeButton);
+                fragment.appendChild(item);
+            });
+
+            optionsList.replaceChildren(fragment);
+            choiceCount.textContent = options.length + (options.length === 1
+                ? ' choice'
+                : ' choices');
+            spinButton.disabled = spinning || options.length < 2;
         }
+
+        function drawEmptyWheel() {
+            const center = canvas.width / 2;
+            const radius = center - 18;
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.beginPath();
+            context.arc(center, center, radius, 0, Math.PI * 2);
+            context.fillStyle = '#ece8df';
+            context.fill();
+            context.lineWidth = 3;
+            context.strokeStyle = '#b8b5ad';
+            context.stroke();
+            context.fillStyle = '#686761';
+            context.font = '600 28px "Space Grotesk", "Segoe UI", sans-serif';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText('Add your choices', center, center);
+            canvas.setAttribute('aria-label', 'Empty decision wheel');
+        }
+
+        function drawWheel() {
+            if (options.length === 0) {
+                drawEmptyWheel();
+                return;
+            }
+
+            const center = canvas.width / 2;
+            const radius = center - 18;
+            const segmentAngle = (Math.PI * 2) / options.length;
+            const colors = wheelStyle === 'roulette'
+                ? ROULETTE_SEGMENTS
+                : COLOR_SEGMENTS;
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.save();
+            context.translate(center, center);
+
+            options.forEach((option, index) => {
+                const startAngle = POINTER_ANGLE_RADIANS - segmentAngle / 2
+                    + index * segmentAngle;
+                const endAngle = startAngle + segmentAngle;
+                const color = colors[index % colors.length];
+
+                context.beginPath();
+                context.moveTo(0, 0);
+                context.arc(0, 0, radius, startAngle, endAngle);
+                context.closePath();
+                context.fillStyle = color.background;
+                context.fill();
+                context.lineWidth = 5;
+                context.strokeStyle = '#f5f2eb';
+                context.stroke();
+
+                const label = option.length > 20
+                    ? option.slice(0, 18) + '…'
+                    : option;
+                const labelAngle = POINTER_ANGLE_RADIANS + index * segmentAngle;
+                const fontSize = options.length <= 6
+                    ? 30
+                    : options.length <= 12
+                        ? 22
+                        : 15;
+
+                context.save();
+                context.rotate(labelAngle);
+                context.translate(radius * 0.58, 0);
+                context.rotate(-labelAngle);
+                context.fillStyle = color.text;
+                context.font = '600 ' + fontSize
+                    + 'px "Space Grotesk", "Segoe UI", sans-serif';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText(label, 0, 0, radius * 0.62);
+                context.restore();
+            });
+
+            context.restore();
+            canvas.setAttribute(
+                'aria-label',
+                'Decision wheel with ' + options.length
+                    + (options.length === 1 ? ' choice: ' : ' choices: ')
+                    + options.join(', ')
+            );
+        }
+
+        function setSpinning(isSpinning) {
+            spinning = isSpinning;
+            editor.querySelectorAll('button, input').forEach(control => {
+                control.disabled = isSpinning;
+            });
+            spinButton.disabled = isSpinning || options.length < 2;
+            canvas.setAttribute('aria-busy', String(isSpinning));
+        }
+
+        function finishSpin(selectedOption) {
+            window.clearTimeout(spinTimer);
+            rotation = ((rotation % 360) + 360) % 360;
+            canvas.style.transition = 'none';
+            canvas.style.transform = 'rotate(' + rotation + 'deg)';
+            setSpinning(false);
+            setStatus('Selected: ' + selectedOption);
+        }
+
+        function spinWheel() {
+            if (spinning || options.length < 2) {
+                return;
+            }
+
+            const spinOptions = [...options];
+            const selectedIndex = Math.floor(Math.random() * spinOptions.length);
+            const degreesPerSegment = 360 / spinOptions.length;
+            const pointerAngle = POINTER_ANGLE_RADIANS * 180 / Math.PI;
+            const selectedCenter = pointerAngle
+                + selectedIndex * degreesPerSegment;
+            const targetAngle = (
+                pointerAngle - selectedCenter + 360
+            ) % 360;
+            const currentAngle = ((rotation % 360) + 360) % 360;
+            const alignment = (targetAngle - currentAngle + 360) % 360;
+            const turns = 6 + Math.floor(Math.random() * 3);
+            const reducedMotion = window.matchMedia(
+                '(prefers-reduced-motion: reduce)'
+            ).matches;
+            const duration = reducedMotion ? 0 : SPIN_DURATION_MS;
+
+            rotation += turns * 360 + alignment;
+            setSpinning(true);
+            setStatus('Spinning…');
+            canvas.style.transition = 'transform ' + duration
+                + 'ms cubic-bezier(0.2, 0.75, 0.25, 1)';
+            canvas.style.transform = 'rotate(' + rotation + 'deg)';
+            spinTimer = window.setTimeout(
+                () => finishSpin(spinOptions[selectedIndex]),
+                duration + 40
+            );
+        }
+
+        addForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const option = cleanOption(optionInput.value);
+
+            if (!option) {
+                optionInput.setCustomValidity('Enter a choice.');
+                optionInput.reportValidity();
+                return;
+            }
+            if (options.length >= MAX_OPTIONS) {
+                setStatus('The wheel supports up to 100 choices.', true);
+                return;
+            }
+
+            optionInput.setCustomValidity('');
+            optionInput.value = '';
+            commitOptions([...options, option]);
+            optionInput.focus();
+        });
+
+        optionInput.addEventListener('input', () => {
+            optionInput.setCustomValidity('');
+        });
+
+        rangeForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const maximum = rangeMax.valueAsNumber;
+
+            if (!Number.isInteger(maximum) || maximum < 2 || maximum > MAX_OPTIONS) {
+                rangeMax.setCustomValidity('Enter a number from 2 to 100.');
+                rangeMax.reportValidity();
+                return;
+            }
+
+            rangeMax.setCustomValidity('');
+            commitOptions(
+                Array.from({ length: maximum }, (_, index) => String(index + 1))
+            );
+        });
+
+        rangeMax.addEventListener('input', () => {
+            rangeMax.setCustomValidity('');
+        });
+
+        spinButton.addEventListener('click', spinWheel);
+
+        document.querySelectorAll('input[name="wheelStyle"]').forEach(control => {
+            control.addEventListener('change', event => {
+                wheelStyle = event.target.value;
+                drawWheel();
+            });
+        });
 
         document.getElementById('importButton').addEventListener('click', () => {
-            const importedOptions = prompt('Paste your options (comma-separated):');
-            if (importedOptions) {
-                options.length = 0;
-                importedOptions.split(',').forEach(option => {
-                    options.push(option.trim());
-                });
-                renderOptions();
-                drawClassicWheel();
-                drawRouletteWheel();
+            const value = window.prompt(
+                'Paste choices separated by commas or new lines:'
+            );
+            if (value === null) {
+                return;
             }
+
+            const imported = value
+                .split(/[\n,]/)
+                .map(cleanOption)
+                .filter(Boolean);
+
+            if (imported.length === 0) {
+                setStatus('No valid choices were found.', true);
+                return;
+            }
+            if (imported.length > MAX_OPTIONS) {
+                setStatus('Import supports up to 100 choices.', true);
+                return;
+            }
+
+            commitOptions(imported);
         });
 
         document.getElementById('exportButton').addEventListener('click', () => {
-            const exportedOptions = options.join(', ');
-            alert(`${exportedOptions}`);
+            if (options.length === 0) {
+                setStatus('There are no choices to export.', true);
+                return;
+            }
+            window.prompt('Copy your choices:', options.join(', '));
         });
 
-        document.getElementById('clearOptionsButton').addEventListener('click', () => {
-            localStorage.removeItem('wheelOptions');
-            options.length = 0;
-            renderOptions();
-            drawClassicWheel();
-            drawRouletteWheel();
+        document.getElementById('clearButton').addEventListener('click', () => {
+            if (options.length === 0) {
+                return;
+            }
+            if (window.confirm('Clear all saved choices?')) {
+                commitOptions([]);
+                optionInput.focus();
+            }
+        });
+
+        document.getElementById('openRandomDialog').addEventListener('click', () => {
+            randomResult.textContent = '';
+            randomDialog.showModal();
+            document.getElementById('minNumber').focus();
+        });
+
+        document.getElementById('closeRandomDialog').addEventListener('click', () => {
+            randomDialog.close();
+        });
+
+        randomForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const minimumInput = document.getElementById('minNumber');
+            const maximumInput = document.getElementById('maxNumber');
+            const minimum = minimumInput.valueAsNumber;
+            const maximum = maximumInput.valueAsNumber;
+
+            if (!Number.isInteger(minimum) || !Number.isInteger(maximum)
+                    || minimum > maximum) {
+                randomResult.textContent = 'Minimum must be less than or equal to maximum.';
+                minimumInput.focus();
+                return;
+            }
+
+            const randomNumber = Math.floor(
+                Math.random() * (maximum - minimum + 1)
+            ) + minimum;
+            randomResult.textContent = 'Generated number: ' + randomNumber;
         });
 
         renderOptions();
-        drawClassicWheel();
-        drawRouletteWheel();
-
-        const randomNumberModal = document.getElementById('randomNumberModal');
-        const openRandomNumberModal = document.getElementById('openRandomNumberModal');
-        const closeRNG = document.getElementsByClassName('close')[0];
-        const generateRandomNumberButton = document.getElementById('generateRandomNumber');
-        const randomNumberResult = document.getElementById('randomNumberResult');
-
-        openRandomNumberModal.addEventListener('click', () => {
-            randomNumberModal.style.display = 'flex';
-        });
-
-        closeRNG.addEventListener('click', () => {
-            randomNumberModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (event) => {
-            if (event.target === randomNumberModal) {
-                randomNumberModal.style.display = 'none';
-            }
-        });
-
-        generateRandomNumberButton.addEventListener('click', () => {
-            const min = parseInt(document.getElementById('minNumber').value);
-            const max = parseInt(document.getElementById('maxNumberRNG').value);
-            if (min < max) {
-                const randomNumber = Math.floor(Math.random() *
-                    (max - min + 1)) + min;
-                randomNumberResult.innerText = `Generated Number: ${randomNumber}`;
-            } else {
-                randomNumberResult.innerText = 'Invalid range. Make sure min < max.';
-            }
-        });
-
-        const toggleOptionsButton = document.getElementById('toggleOptionsButton');
-        let optionsVisible = false;
-
-        toggleOptionsButton.innerText = 'Show/Hide';
-
-        toggleOptionsButton.addEventListener('click', () => {
-            if (optionsVisible) {
-                optionsList.style.display = 'none';
-            } else {
-                optionsList.style.display = 'block';
-            }
-            optionsVisible = !optionsVisible;
-        });
-
-        document.getElementById('year').textContent = new Date().getFullYear();
-        document.getElementById('generateRange').addEventListener('click', () => {
-            const maxNumber = parseInt(document.getElementById('maxNumber').value);
-            if (maxNumber && maxNumber > 0) {
-                options.length = 0;
-                for (let i = 1; i <= maxNumber; i += 1) {
-                    options.push(i.toString());
-                }
-                renderOptions();
-                drawClassicWheel();
-                drawRouletteWheel();
-            } else {
-                alert('Please enter a valid number greater than 0');
-            }
-        });
+        drawWheel();
+        setStatus(readyMessage());
     </script>
 </body>
 </html>
