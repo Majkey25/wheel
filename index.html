@@ -951,14 +951,26 @@
 
         document.getElementById('importButton').addEventListener('click', () => {
             const value = window.prompt(
-                'Paste choices separated by commas or new lines:'
+                'Paste exported choices or choices separated by commas or new lines:'
             );
             if (value === null) {
                 return;
             }
 
-            const imported = value
-                .split(/[\n,]/)
+            let choices;
+            try {
+                choices = value.trimStart().startsWith('[')
+                    ? JSON.parse(value)
+                    : value.split(/[\n,]/);
+            } catch {
+                choices = value.split(/[\n,]/);
+            }
+            if (!Array.isArray(choices) || choices.some(choice => typeof choice !== 'string')) {
+                setStatus('Import must contain a list of choices.', true);
+                return;
+            }
+
+            const imported = choices
                 .map(cleanOption)
                 .filter(Boolean);
 
@@ -979,7 +991,7 @@
                 setStatus('There are no choices to export.', true);
                 return;
             }
-            window.prompt('Copy your choices:', options.join(', '));
+            window.prompt('Copy your choices:', JSON.stringify(options));
         });
 
         document.getElementById('clearButton').addEventListener('click', () => {
